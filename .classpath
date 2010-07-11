@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="/Users/carueda/Software/gwt-2.0.3/gwt-user.jar"/>
+	<classpathentry kind="lib" path="/Users/carueda/Software/gwt-2.0.3/gwt-dev.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/icepush-gwt.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/icepush.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-maps.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-incubator-20100204-r1747.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gchart.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.restlet.jar" sourcepath="/Users/carueda/Software/restlet-jee-2.0rc3/src"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.restlet.ext.servlet.jar" sourcepath="/Users/carueda/Software/restlet-jee-2.0rc3/src"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.restlet.ext.xml.jar" sourcepath="/Users/carueda/Software/restlet-jee-2.0rc3/src/org.restlet.ext.xml"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+</classpath>

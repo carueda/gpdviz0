@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='gpdviz'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+  
+  
+  <inherits name='com.google.gwt.user.theme.standard.Standard'/>
+  <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+  <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
+
+  <!-- Other module inherits                                      -->
+
+  <inherits name="org.icepush.gwt.ICEpush"/>
+  <inherits name='com.google.gwt.http.HTTP'/>
+  <inherits name='com.google.gwt.xml.XML'/>
+  <inherits name='com.google.gwt.widgetideas.GWTCanvas'/>
+  <inherits name='com.googlecode.gchart.GChart'/>
+  
+
+  <!-- Specify the app entry point class.                         -->
+  <entry-point class='org.gpdviz.gwt.client.Gpdviz'/>
+
+  <!-- Specify the paths for translatable code                    -->
+  <source path='ss'/>
+  <source path='gwt/client'/>
+
+
+
+	<!-- GoogleMaps -->
+	<inherits name="com.google.gwt.maps.GoogleMaps" />
+	 <!--
+	    If you want to deploy this application outside of localhost,
+	    you must obtain a Google Maps API key at:
+	    http://www.google.com/apis/maps/signup.html
+	    Replace the src attribute below with a URL that contains your key.
+	  -->
+	 <!-- script src="http://maps.google.com/maps?gwt=1&amp;file=api&amp;v=2&amp;key=???" /-->
+	 <script src="http://maps.google.com/maps?gwt=1&amp;file=api&amp;v=2&amp;key=ABQIAAAAuSSM-L5BlccPSWMiRgOeGhT-9wX3__ettXKqWsuKDpPPKQmDNhQ9am1gBUdO2D5v_19iKQuQBmqG1g" />
+	
+	 <!-- You can usually run under localhost without a key                           -->
+	 <!-- Set the 'sensor' parameter to true if your app makes use of an onboard
+	      positioning sensor, such as a GPS reciever.
+	   -->
+	 <!-- script src="http://maps.google.com/maps?gwt=1&amp;file=api&amp;v=2&amp;sensor=false" /
+-->
+
+</module>

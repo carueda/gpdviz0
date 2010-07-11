@@ -1,0 +1,134 @@
+Gpdviz - Web-based Visualization of Geolocated Point Data Streams in Real-time
+Carlos Rueda - MBARI
+
+ChangeLog
+
+2010-07-09,10
+	- general code reorganization
+	- running the demo programs via ant targets (see README.txt)
+	- XML output now with complete state starting from requested entity, eg.,
+	  http://localhost:8080/gpdviz/rest/ shows all the sensor systems and their streams.
+	- Now a number of values is remembered for each stream (SensorSystemInfo.MAX_NO_VALUES)
+	
+	TODO:
+	  - Add timestamp to values
+	  - display timestamp and value as in sosplot
+	  - Admin interface?
+	
+	
+2010-07-01
+	- some preliminary set-up to create client library and run mock provider programs
+	  from command-line so it's easier for other to run the demo:
+	  
+	Tests are OK with my http://localhost:8080/gpdviz deployment, but the one at http://mmisw.org/gpdviz 
+	is failing with:
+		SEVERE: An exception occured writing the response entity
+		java.io.IOException: Couldn't write the XML representation: Provider net.sf.saxon.TransformerFactoryImpl not found
+			at org.restlet.ext.xml.DomRepresentation.write(DomRepresentation.java:278)
+	
+	  
+2010-06-06
+	- REST operations now processed:
+		- add sensor system
+		- add source
+		- add stream
+		- add value to a stream
+		- reset sensor system
+
+	current test:
+		- run gpdviz.launch
+		- run MockProvider.Generate (creates mock1 and some sources src_0, src_1, ...)
+		- try REST GET:
+			http://127.0.0.1:8888/rest/             -- list of sensor systems
+			http://127.0.0.1:8888/rest/mock1        -- particular sensor system
+			http://127.0.0.1:8888/rest/mock1/       -- sources of a sensor system
+			http://127.0.0.1:8888/rest/mock1/src_0  -- particular source
+			http://127.0.0.1:8888/rest/mock1/src_0/  -- streams of a source
+			http://127.0.0.1:8888/rest/mock1/src_0/str_0  -- particular stream including last known value
+		- try viz client:
+		    http://127.0.0.1:8888/gpdviz.html?ssid=mock1&gwt.codesvr=127.0.0.1:9997
+
+	- viz client: call with gmap=no to not include the google map:
+	      http://127.0.0.1:8888/gpdviz.html?ssid=mock1&gmap=no
+	      
+
+2010-06-04
+	- several simplifications and adjustments to operate around the REST interface. 
+	  Now the visualizer receives newSource and RESET events.
+	  
+	- See the various TODOs in the code.
+	
+	
+2010-06-01
+	- preparing GpdvizClient high-level API for REST clients
+	
+	current test:
+		- run gpdviz.launch
+		- run MockProvider (creates mock1 and some sources src_0, src_1, ...)
+		- then try:
+			http://127.0.0.1:8888/rest/             -- list of sensor systems
+			http://127.0.0.1:8888/rest/mock1        -- particular sensor system
+			http://127.0.0.1:8888/rest/mock1/       -- sources of a sensor system
+			http://127.0.0.1:8888/rest/mock1/src_0  -- particular source
+	
+2010-05-31
+	- SensorSystemRegistry properly shared across the various servlets.
+	- TODO do likewise for SensorSystemManager
+
+	- Three main services:
+		1- GpdvizAdminService will support services for an admin interface:
+			- show the registered sensor systems and current state (last activity)
+			- other admin operations TBD
+		2- GpdvizService: the visualizer interface for a specific ssid
+		3- MockProviderService will control the mock provider; this will let the user
+		   indicate the desired ssid, and its back-end will trigger the notification of
+		   the associated events via the REST interface.
+		   
+	- NOTE: all providers will only use the REST interface to notify updates to Gpdviz, 
+	  ie., RestSensorSystem will be the only implementation of ISensorSystem relevant to Gpdviz.
+	  TODO: complement this by separating MockSensorSystem so it's only related with the
+	  mock provider code.
+
+previous work:
+
+	- using icePush
+	- dispatch of generic sensor systems
+	- simple sensor system registry
+	- a sensor system is a collection of sources; each source can have
+	  multiple streams and sub-sources (sources are groups)
+	- currently only "new" events: new source; new stream; new value
+	- a source have an associated lat-lon location
+	- sources are grouped on the same location
+	- currently only a mock sensor system available
+	- incorporating restlet
+	  http://127.0.0.1:8888/rest/ss?gwt.codesvr=127.0.0.1:9997
+	- next: handle source and stream resources
+
+	open gpdviz.html -> viz client; gmaps included
+	open admin.html -> admin to activate/deactivate a sensor system
+	in both cases, add ?ssid=mock1 to indicate desired sensor system
+
+
+	-- note about working offline and google maps
+	an RPC error is gotten
+	
+	--some notes about icePush behavior--
+	
+	ClientPushCommandContext context = ClientPushCommandContext.getInstance();
+	EventCommandHandler cmdHandler = new EventCommandHandler(_popup);
+	
+	# the order of registerExecuter calls *matters* !
+	context.registerExecuter(MyClass1.class, cmdHandler);
+	context.registerExecuter(MyClass2.class, cmdHandler);
+	
+	In this order, MyClass2 commands get fired immediately on the client, while 
+	MyClass1 commands get triggered only when a MyClass2 command comes!
+	
+	From this, I decided to have just one single type of command, and call
+	registerExecuter only once for that class. An attribute of the command class
+	gives the specific type of event.
+	
+	
+2009-11-12
+	- started project. 
+

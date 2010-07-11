@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+  
+  <!-- <icepush> -->
+	<listener>
+		<listener-class>org.icepush.gwt.server.PushCommandContextListener</listener-class>
+	</listener>
+	<servlet>
+		<servlet-name>icepush</servlet-name>
+		<servlet-class>org.icepush.servlet.ICEpushServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>icepush</servlet-name>
+		<url-pattern>*.icepush</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>icepushGWTCommand</servlet-name>
+		<servlet-class>org.icepush.gwt.server.PushCommandServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>icepushGWTCommand</servlet-name>
+		<url-pattern>/gpdviz/commandPushService</url-pattern>
+	</servlet-mapping>
+  <!-- </icepush> -->
+    
+    
+   <!-- <Restlet>  -->
+	<context-param>
+		<param-name>org.restlet.application</param-name>
+		<param-value> org.gpdviz.gwt.server.restlet.GpdvizRestletApplication 
+		</param-value>
+	</context-param>
+	<servlet>
+		<servlet-name>RestletServlet</servlet-name>
+		<servlet-class> org.restlet.ext.servlet.ServerServlet </servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RestletServlet</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping> 
+   <!-- </Restlet>  -->  
+ 
+   <!-- <gpdviz-core> -->
+	<servlet>
+		<servlet-name>gpdvizCoreServlet</servlet-name>
+		<servlet-class>org.gpdviz.gwt.server.CoreServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>gpdvizCoreServlet</servlet-name>
+		<url-pattern>/gpdviz/core</url-pattern>
+	</servlet-mapping>
+  <!-- </gpdviz-core> -->
+ 
+   <!-- <gpdviz-service> -->
+	<servlet>
+		<servlet-name>gpdvizServiceServlet</servlet-name>
+		<servlet-class>org.gpdviz.gwt.server.GpdvizServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>gpdvizServiceServlet</servlet-name>
+		<url-pattern>/gpdviz/gpdviz</url-pattern>
+	</servlet-mapping>
+  <!-- </gpdviz-service> -->
+ 
+  <!-- <gpdviz-admin> -->
+	<servlet>
+		<servlet-name>gpdvizAdminServlet</servlet-name>
+		<servlet-class>org.gpdviz.gwt.server.GpdvizAdminServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>gpdvizAdminServlet</servlet-name>
+		<url-pattern>/gpdviz/admin</url-pattern>
+	</servlet-mapping>
+  <!-- </gpdviz-admin> -->
+  
+ 
+	<welcome-file-list>
+		<welcome-file>gpdviz.html</welcome-file>
+	</welcome-file-list>
+  
+</web-app>
