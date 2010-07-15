@@ -17,13 +17,18 @@ sensor systems and notify updates against the http://localhost:8080/gpdviz deplo
 The gpdviz-client.jar library provides a high-level API for data providers to interact 
 with a Gpdviz endpoint. Test programs are included for demonstration.
 
-Building and running
+Pre-requisites
 
-The following assumes your system has Subversion and Apache Ant.
+Subversion, Apache Ant, and Google Web Toolkit are installed on your system.
+
+Building and running
  
 	# get a copy of the code:
-	$ svn checkout http://gpdviz.googlecode.com/svn/trunk/ gpdviz
+	$ svn checkout http://gpdviz.googlecode.com/svn/trunk/gpdviz
 	$ cd gpdviz
+	# have your own build.properties:
+	# cp sample.build.properties build.properties
+	# edit build.properties as appropriate for your system.
 	
 	# create gpdviz.war:
 	$ ant war

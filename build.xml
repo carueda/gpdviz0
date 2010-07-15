@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <project name="gpdviz" default="war" basedir=".">
 	
+	<property file="build.properties" />	
+	
 	<!-- Gpdviz endpoint for test programs -->
 	<property name="endpoint" value="http://localhost:8080/gpdviz/rest" />
 	
   <!-- Arguments to gwtc and devmode targets -->
   <property name="gwt.args" value="" />
-
-  <!-- Configure path to GWT SDK -->
-  <property name="gwt.sdk" location="/Users/carueda/Software/gwt-2.0.3" />
 
   <path id="project.class.path">
     <pathelement location="war/WEB-INF/classes"/>
