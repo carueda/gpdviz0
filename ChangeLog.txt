@@ -3,6 +3,17 @@ Carlos Rueda - MBARI
 
 ChangeLog
 
+2010-07-16
+	- Handling of REGISTER and UNREGISTER events. The visualizer can now be started with
+	  an unregistered sensor system; it will automatically react to the registration event.
+	  
+	- indicate &_log=y in URL to include some logging in the window.
+	
+2010-07-15
+	- Using build.properties (via sample.build.properties) to facilitate build
+	- README updates
+	- testing on mmisw.org deployment 
+	
 2010-07-09,10
 	- general code reorganization
 	- running the demo programs via ant targets (see README.txt)

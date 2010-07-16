@@ -3,6 +3,7 @@ package org.gpdviz.gwt.client.viz;
 
 import java.util.List;
 
+import org.gpdviz.gwt.client.Gpdviz;
 import org.gpdviz.gwt.client.map.GMap;
 import org.gpdviz.gwt.client.service.GpdvizServiceAsync;
 import org.gpdviz.gwt.client.util.MessagesPopup;
@@ -87,7 +88,13 @@ public class VizPanel extends VerticalPanel {
 		Panels.reset();
 		setStatus("RESET");
 	}
-
+	
+	public void unregister() {
+		reset();
+		refreshState(null);
+		Gpdviz.log(this.getClass().getName()+ ": unregister: " +ssid);
+	}
+	
 	void setStatus(String string) {
 		statusLabel.setText(string);
 	}
@@ -118,6 +125,23 @@ public class VizPanel extends VerticalPanel {
 
 	}
 
+	public void removeSource(String srcfid) {
+		SourcePanel srcPanel = Panels.getSourcePanel(srcfid);
+		if ( srcPanel == null ) {
+			return;
+		}
+		
+		Source src = srcPanel.getSource();
+		String lat = src.getStringAttribute("latitude");
+		String lon = src.getStringAttribute("longitude");
+		
+		LocationPanel locPanel = Panels.getLocationPanel(lat, lon);
+		if ( locPanel == null ) {
+			return;
+		}
+		locPanel.removeSourcePanel(srcPanel);
+	}
+	
 	private void _addLoc(String lat, String lon, Widget widget) {
 		if ( gmap != null ) {
 			gmap.addLoc(lat, lon, widget);
@@ -173,6 +197,33 @@ public class VizPanel extends VerticalPanel {
 
 	}
 	
+	public void removeStream(String srcfid, String strid) {
+		
+		SourcePanel srcPanel = Panels.getSourcePanel(srcfid);
+		if ( srcPanel == null ) {
+			return;
+		}
+		
+		// TODO
+		String strfid = srcfid+ "/";
+		
+		// now create the stream panel
+		StreamPanel strPanel = Panels.getStreamPanel(strfid);
+		if ( strPanel == null ) {
+			return;
+		}
+		
+		srcPanel.removeStreamPanel(strPanel);
+		
+		Source src = srcPanel.getSource();
+		String lat = src.getStringAttribute("latitude");
+		String lon = src.getStringAttribute("longitude");
+		LocationPanel locPanel = Panels.getLocationPanel(lat, lon);
+		assert locPanel != null ;
+		_updateLoc(lat, lon, locPanel.getWidget());
+		
+	}
+	
 	public void addNewValue(String strfid, String value) {
 		StreamPanel strPanel = Panels.getStreamPanel(strfid);
 //		Stream str = strPanel.getStr();
@@ -189,27 +240,36 @@ public class VizPanel extends VerticalPanel {
 				setStatus("ERROR: " +caught.getClass().getName()+ ": " +caught.getMessage());
 			}
 
-			public void onSuccess(SensorSystemInfo ss) {
-				if ( ss == null ) {
-					descriptionLabel.setText("?");
-					setStatus("NOTE: " + "No sensor system by the given ID: " +ssid);
-					return;
-				}
-				descriptionLabel.setText("Sensor system: " +ssid+ ": " +ss.getDescription());
-				refreshState(ss);
+			public void onSuccess(SensorSystemInfo ssi) {
+				refreshState(ssi);
+				
+				// and prepare to receive events:
+				// Note, this is done even if no such sensor system is currently registered
+				EventCommandHandlers.setHandlers(ssid, VizPanel.this, messages);
 			}
 		});
 		
 	}
 
 
-	private void refreshState(final SensorSystemInfo ss) {
+	private void refreshState(final SensorSystemInfo ssi) {
+		
+		Gpdviz.log(this.getClass().getName()+ ": refreshState: " +ssid+ ": " +ssi);
+
+		if ( ssi == null ) {
+			descriptionLabel.setText("?");
+			setStatus(ssid+ ": sensor system not currently registered. Waiting for registration event...");
+			return;
+		}
+
+		descriptionLabel.setText("Sensor system: " +ssid+ ": " +ssi.getDescription());
+		setStatus(ssid+ ": waiting for updates...");
 		
 		// initialize interface with obtained sensor system info:
 		
 		// add sources:
-		for ( String srcfid : ss.getSourceFullIds() ) { 
-			final Source src = ss.getSource(srcfid);
+		for ( String srcfid : ssi.getSourceFullIds() ) { 
+			final Source src = ssi.getSource(srcfid);
 			DeferredCommand.addCommand(new Command() {
 				public void execute() {
 					addSource(src);
@@ -219,15 +279,15 @@ public class VizPanel extends VerticalPanel {
 		
 		// for each, source, add its streams, 
 		// each with its last known value, if any:
-		for ( String srcfid : ss.getSourceFullIds() ) { 
-			List<Stream> strs = ss.getStreams(srcfid );
+		for ( String srcfid : ssi.getSourceFullIds() ) { 
+			List<Stream> strs = ssi.getStreams(srcfid );
 			for ( final Stream str : strs ) {
 				DeferredCommand.addCommand(new Command() {
 					public void execute() {
 						addStream(str);
 						
 						String strfid = str.getFullName();
-						List<String> values = ss.getLastValue(strfid);
+						List<String> values = ssi.getLastValue(strfid);
 						if ( values != null ) {
 							for ( String value : values ) {
 								addNewValue(strfid, value);
@@ -237,13 +297,14 @@ public class VizPanel extends VerticalPanel {
 				});
 			}
 		}
-		
-		// TODO add latest values for each stream.
-		// ...
-		
-		// and prepare to receive events:
-		setStatus(ssid+ ": waiting for updates...");
-		EventCommandHandlers.setHandlers(ssid, this, messages);
+	}
+
+	public String getSsid() {
+		return ssid;
+	}
+
+	public void setSensorSystemInfo(SensorSystemInfo ssi) {
+		refreshState(ssi);		
 	}
 
 }

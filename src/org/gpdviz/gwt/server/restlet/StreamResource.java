@@ -61,7 +61,7 @@ public class StreamResource extends BaseResource {
 	@Delete
 	public void removeItem() {
 		if (ss != null) {
-			ss.getSensorSystemInfo().getStreams().remove(strfid);
+			ss.removeStream(srcfid, strid);
 		}
 
 		setStatus(Status.SUCCESS_NO_CONTENT);

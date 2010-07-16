@@ -27,7 +27,7 @@ public class SensorSystemManager {
 		HashMap<String,SensorSystemManager>();
 	
 	
-	public static synchronized SensorSystemManager getSensorSystemManager(SensorSystem ss) {
+	public static synchronized SensorSystemManager createSensorSystemManager(SensorSystem ss) {
 		String ssid = ss.getSsid();
 		SensorSystemManager ssManager = ssManagers.get(ssid);
 		if ( ssManager == null ) {
@@ -37,6 +37,11 @@ public class SensorSystemManager {
 		return ssManager;
 	}
 
+	public static synchronized SensorSystemManager getSensorSystemManager(String ssid) {
+		SensorSystemManager ssManager = ssManagers.get(ssid);
+		return ssManager;
+	}
+	
 	private static synchronized void removeSensorSystemManager(SensorSystemManager ssMan) {
 		String ssid = ssMan.sensorSystem.getSsid();
 		ssManagers.remove(ssid);
@@ -98,7 +103,7 @@ public class SensorSystemManager {
 		listeners.remove(listener);
 	}
 	
-	// TODO This is not called anywhere.  In general, when to release unused resources?
+	// TODO In general, review release of unused resources
 	public void deactivate() {
 		removeSensorSystemManager(this);
 	}

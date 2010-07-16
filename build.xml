@@ -174,7 +174,7 @@ Test targets suppressed because -junit argument was not specified when running w
 	  </target>
 
 	<!-- simple client test -->
-	  <target name="client" depends="client-jar">
+	  <target name="simple-client" depends="client-jar">
 	    <java failonerror="true" fork="true" classname="org.gpdviz.client.GpdvizClientTest">
 	      <classpath>
 		      <pathelement location="war/WEB-INF/lib/org.restlet.jar"/>
@@ -199,17 +199,6 @@ Test targets suppressed because -junit argument was not specified when running w
 	    </javac>
 	  </target>
 	
-	  <target name="mock-reset" depends="mock-compile">
-	    <java failonerror="true" fork="true" classname="org.gpdviz.mock.Reset">
-	      <classpath>
-			  <path refid="project.class.path"/>
-		      <pathelement location="_generated/gpdviz-client.jar"/>
-		      <pathelement location="_generated/mock/classes"/>
-	      </classpath>
-	      <arg value="${endpoint}"/>
-	    </java>
-	  </target>
-
 	  <target name="mock-generate" depends="mock-compile">
 	    <java failonerror="true" fork="true" classname="org.gpdviz.mock.Generate">
 	      <classpath>
@@ -220,5 +209,28 @@ Test targets suppressed because -junit argument was not specified when running w
 	   	  <arg value="${endpoint}"/>
 	    </java>
 	  </target>
+	
+	  <target name="mock-reset" depends="mock-compile">
+	    <java failonerror="true" fork="true" classname="org.gpdviz.mock.Reset">
+	      <classpath>
+			  <path refid="project.class.path"/>
+		      <pathelement location="_generated/gpdviz-client.jar"/>
+		      <pathelement location="_generated/mock/classes"/>
+	      </classpath>
+	      <arg value="${endpoint}"/>
+	    </java>
+	  </target>
+	
+	  <target name="mock-unregister" depends="mock-compile">
+	    <java failonerror="true" fork="true" classname="org.gpdviz.mock.Unregister">
+	      <classpath>
+			  <path refid="project.class.path"/>
+		      <pathelement location="_generated/gpdviz-client.jar"/>
+		      <pathelement location="_generated/mock/classes"/>
+	      </classpath>
+	      <arg value="${endpoint}"/>
+	    </java>
+	  </target>
+
 
 </project>

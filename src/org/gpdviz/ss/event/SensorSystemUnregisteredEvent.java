@@ -4,12 +4,14 @@ package org.gpdviz.ss.event;
 public class SensorSystemUnregisteredEvent extends IvEvent {
 	private static final long serialVersionUID = 1L;
 	
+	private String msg;
 	
 	SensorSystemUnregisteredEvent() {
 	}
 	
-	public SensorSystemUnregisteredEvent(String ssid) {
+	public SensorSystemUnregisteredEvent(String ssid, String msg) {
 		super(ssid);
+		this.msg = msg;
 	}
 
 	@Override
@@ -17,14 +19,11 @@ public class SensorSystemUnregisteredEvent extends IvEvent {
 		ed.dispatchSensorSystemUnregisteredEvent(this);
 	}
 	
+	public String getMessage() {
+		return msg;
+	}
 
 	protected String getSuffix() {
 		return "+UNREGISTERED";
 	}
-	
-//	@Override
-//	public IvEvent clone() {
-//		return new NewSourceEvent(ssid, src);
-//	}
-
 }

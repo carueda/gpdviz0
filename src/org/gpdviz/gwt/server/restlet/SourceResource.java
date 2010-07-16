@@ -46,7 +46,7 @@ public class SourceResource extends BaseResource {
 	@Delete
 	public void removeItem() {
 		if (ss != null) {
-			ss.getSensorSystemInfo().getSources().remove(srcid);
+			ss.removeSource(srcid);
 		}
 
 		setStatus(Status.SUCCESS_NO_CONTENT);

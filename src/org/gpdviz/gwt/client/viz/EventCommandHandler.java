@@ -1,5 +1,6 @@
 package org.gpdviz.gwt.client.viz;
 
+import org.gpdviz.gwt.client.Gpdviz;
 import org.gpdviz.gwt.client.util.MessagesPopup;
 import org.gpdviz.ss.Source;
 import org.gpdviz.ss.Stream;
@@ -12,10 +13,11 @@ import org.gpdviz.ss.event.NewValueEvent;
 import org.gpdviz.ss.event.SensorSystemRegisteredEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 import org.gpdviz.ss.event.SensorSystemUnregisteredEvent;
+import org.gpdviz.ss.event.SourceRemovedEvent;
+import org.gpdviz.ss.event.StreamRemovedEvent;
 import org.icepush.gwt.client.command.ICommand;
 import org.icepush.gwt.client.command.ICommandExecuter;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 
@@ -43,39 +45,70 @@ class EventCommandHandler implements ICommandExecuter, IvEventDispatcher {
 			event.accept(this);
 		}
 		else {
-			GWT.log("IGNORING " +event);
+			Gpdviz.log("IGNORING " +event);
 		}
 	}
 
-	
-	public void dispatchNewSourceEvent(final NewSourceEvent event) {
+	private void _debugEvent(final IvEvent event) {
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
 				popup.setName(event.toString());
 				popup.show();
+				Gpdviz.log("EVENT: " +event);
+			}
+		});
+	}
+	
+	public void dispatchNewSourceEvent(final NewSourceEvent event) {
+		_debugEvent(event);
+		DeferredCommand.addCommand(new Command() {
+			public void execute() {
 				Source src = event.getSource();
 				vizPanel.addSource(src);
 			}
 		});
 	}
 
-	public void dispatchNewStreamEvent(final NewStreamEvent event) {
+	public void dispatchSourceRemovedEvent(final SourceRemovedEvent event) {
+		_debugEvent(event);
+		
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
-				popup.setName(event.toString());
-				popup.show();
+				String srcfid = event.getSrcfid();
+				vizPanel.removeSource(srcfid);
+			}
+		});
+	}
+
+	public void dispatchNewStreamEvent(final NewStreamEvent event) {
+		_debugEvent(event);
+		
+		DeferredCommand.addCommand(new Command() {
+			public void execute() {
 				Stream str = event.getStream();
 				vizPanel.addStream(str);
 			}
 		});
 	}
-
-	public void dispatchNewValueEvent(final NewValueEvent event) {
+	
+	public void dispatchStreamRemovedEvent(final StreamRemovedEvent event) {
+		_debugEvent(event);
+		
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
-				popup.setName(event.toString());
-				popup.show();
-				// TODO associate to corresp Stream
+				String srcfid = event.getSrcfid();
+				String strid = event.getStrid();
+				vizPanel.removeStream(srcfid, strid);
+			}
+		});
+	}
+		
+
+	public void dispatchNewValueEvent(final NewValueEvent event) {
+		_debugEvent(event);
+		
+		DeferredCommand.addCommand(new Command() {
+			public void execute() {
 				String strfid = event.getStrfid();
 				String value = event.getValue();
 				vizPanel.addNewValue(strfid, value);
@@ -85,38 +118,29 @@ class EventCommandHandler implements ICommandExecuter, IvEventDispatcher {
 
 	
 	public void dispatchSensorSystemRegisteredEvent(final SensorSystemRegisteredEvent event) {
-		// TODO 
+		_debugEvent(event);
+		
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
-				popup.setName(event.toString());
-				popup.show();
+				vizPanel.setSensorSystemInfo(event.getSensorSystemInfo());
 			}
 		});
 	}
 
 	public void dispatchSensorSystemUnregisteredEvent(final SensorSystemUnregisteredEvent event) {
+		_debugEvent(event);
+		
 		// TODO for now, only doing 'reset'
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
-				popup.setName(event.toString());
-				popup.show();
-			}
-		});
-		DeferredCommand.addCommand(new Command() {
-			public void execute() {
-				vizPanel.reset();
+				vizPanel.unregister();
 			}
 		});
 	}
 
 	public void dispatchSensorSystemResetEvent(final SensorSystemResetEvent event) {
-		// TODO
-		DeferredCommand.addCommand(new Command() {
-			public void execute() {
-				popup.setName(event.toString());
-				popup.show();
-			}
-		});
+		_debugEvent(event);
+		
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
 				vizPanel.reset();

@@ -9,6 +9,8 @@ import org.gpdviz.ss.event.NewSourceEvent;
 import org.gpdviz.ss.event.NewStreamEvent;
 import org.gpdviz.ss.event.NewValueEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
+import org.gpdviz.ss.event.SourceRemovedEvent;
+import org.gpdviz.ss.event.StreamRemovedEvent;
 
 
 /**
@@ -54,9 +56,24 @@ public class SensorSystem {
 		notifyEvent(event);
 	}
 	
+	public void removeSource(String srcfid) {
+		sensorSystemInfo.removeSource(srcfid);
+		IvEvent event = new SourceRemovedEvent(ssid, srcfid);
+		notifyEvent(event);
+	}
+	
 	public void addStream(Source src, Stream str) {
 		sensorSystemInfo.addStream(str);
 		IvEvent event = new NewStreamEvent(ssid, src, str);
+		notifyEvent(event);
+	}
+	
+	public void removeStream(String srcid, String strid) {
+		// TODO
+		String srcfid = srcid;
+		String strfid = srcfid+ "/" +strid;
+		sensorSystemInfo.getStreams().remove(strfid);
+		IvEvent event = new StreamRemovedEvent(ssid, srcfid, strid);
 		notifyEvent(event);
 	}
 	

@@ -48,6 +48,15 @@ public class SensorSystemInfo implements Serializable {
 		System.out.println(this.getClass().getName()+ ": addSource " +srcfid) ;
 	}
 
+	/**
+	 * @param srcfid
+	 */
+	public void removeSource(String srcfid) { 
+		_srcs.remove(srcfid);
+		// FIXME remove all streams belonging to this source
+		System.out.println(this.getClass().getName()+ ": removeSource " +srcfid) ;
+	}
+	
 	
 	/**
 	 * Removes all sources/streams.
@@ -128,6 +137,10 @@ public class SensorSystemInfo implements Serializable {
 	 */
 	public List<String> getLastValue(String strfid) {
 		return _lastValues.get(strfid);
+	}
+	
+	public String toString() {
+		return description;
 	}
 	
 	

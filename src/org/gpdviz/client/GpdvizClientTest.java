@@ -29,7 +29,7 @@ public class GpdvizClientTest {
 	private final String STR_ID = "strA";
 	
 	private double x = 0;
-	private double X_INC = Math.PI / 16;
+	private double X_INC = Math.PI / 5;
 
 
 	GpdvizClientTest(String[] args) throws Exception {
@@ -47,6 +47,8 @@ public class GpdvizClientTest {
 
 		gpdvizClient = new GpdvizClient(endPoint);
 		
+		_pause();
+		
 		_prepareSensorSystem();   _pause();
 		_addSource();             _pause();
 		_addStream();             _pause();
@@ -56,7 +58,12 @@ public class GpdvizClientTest {
 			_pause();
 		}
 		
-		_unregisterSensorSystem();	
+		_removeStream();             _pause();
+		_removeSource();             _pause();
+		_resetSensorSystem();        _pause();
+		
+//		if ( false ) 
+		_unregisterSensorSystem();
 	}
 
 	
@@ -93,9 +100,19 @@ public class GpdvizClientTest {
 		_log("addNewSource"+ ": " +SS_ID+ "/" + SRC_ID+ ": " +status);
 	}
 	
+	private void _removeSource() throws Exception {
+		Status status = gpdvizClient.removeSource(SS_ID, SRC_ID);
+		_log("removeSource"+ ": " +SS_ID+ "/" + SRC_ID+ ": " +status);
+	}
+	
 	private void _addStream() throws Exception {
 		Status status = gpdvizClient.addNewStream(SS_ID, SRC_ID, STR_ID);
 		_log("addNewStream"+ ": " +SS_ID+ "/" + SRC_ID+  "/" + STR_ID+ ": " +status);
+	}
+	
+	private void _removeStream() throws Exception {
+		Status status = gpdvizClient.removeStream(SS_ID, SRC_ID, STR_ID);
+		_log("removeStream"+ ": " +SS_ID+ "/" + SRC_ID+  "/" + STR_ID+ ": " +status);
 	}
 	
 	private boolean _addValue() throws Exception {
@@ -111,9 +128,14 @@ public class GpdvizClientTest {
 		return status.equals(Status.SUCCESS_OK);
 	}
 	
+	private void _resetSensorSystem() throws Exception {
+		Status status = gpdvizClient.resetSensorSystem(SS_ID, SS_DESCRIPTION);
+		_log("RESET" + ": " +status);
+	}
+	
 	private void _unregisterSensorSystem() throws Exception {
 		Status status = gpdvizClient.unregisterSensorSystem(SS_ID);
-		_log("unregisterSensorSystem"+ ": " +SS_ID+ ": " +status);
+		_log("UNREGISTER" + ": " +status);
 	}
 	
 }

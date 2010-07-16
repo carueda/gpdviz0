@@ -3,7 +3,7 @@ package org.gpdviz.ss;
 
 /**
  * Information about a stream source. A source is a "site" or "station"
- * comprising a number of streams or even sources, so the sources are
+ * comprising a number of streams or other sources, so sources are
  * organized hierarchically.
  * 
  * @author Carlos Rueda

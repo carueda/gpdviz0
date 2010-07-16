@@ -32,6 +32,10 @@ public class SourcePanel {
 		streams.add(strPanel.getWidget());
 	}
 
+	public void removeStreamPanel(StreamPanel strPanel) {
+		streams.remove(strPanel.getWidget());
+	}
+	
 
 	public Source getSource() {
 		return src;

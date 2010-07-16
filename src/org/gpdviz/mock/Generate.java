@@ -16,6 +16,8 @@ import org.gpdviz.ss.event.NewValueEvent;
 import org.gpdviz.ss.event.SensorSystemRegisteredEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 import org.gpdviz.ss.event.SensorSystemUnregisteredEvent;
+import org.gpdviz.ss.event.SourceRemovedEvent;
+import org.gpdviz.ss.event.StreamRemovedEvent;
 import org.restlet.data.Status;
 
 /**
@@ -25,7 +27,7 @@ import org.restlet.data.Status;
  */
 public class Generate extends MockProvider {
 	/** the Generate program will automatically exit after this duration in minutes */
-	static final int EXIT_MINUTES = 10;
+	static final int EXIT_MINUTES = 2;
 
 	public static void main(String[] args) throws Exception {
 		new Generate(args);
@@ -92,6 +94,17 @@ public class Generate extends MockProvider {
 		terminate.schedule(new TimerTask() {
 			public void run() {
 				_log("Time to stop the demo");
+				try {
+					Status status = gpdvizClient.unregisterSensorSystem(MOCK_SSID);
+					_log("UNREGISTER" + ": " +status);
+					
+					// allow some time before exiting the program:
+					Thread.sleep(2000);
+				}
+				catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				System.exit(0);
 			}
 		}, delay);
@@ -117,6 +130,16 @@ public class Generate extends MockProvider {
 			}
 		}
 		
+		public void dispatchSourceRemovedEvent(SourceRemovedEvent event) {
+			String srcfid = event.getSrcfid();
+			Status status = gpdvizClient.removeSource(MOCK_SSID, srcfid);
+			
+			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcfid+ ": " +status);
+			if ( ! status.equals(Status.SUCCESS_OK) ) {
+				mock.deactivate();
+			}			
+		}
+		
 		public void dispatchNewStreamEvent(NewStreamEvent event) {
 			
 			Source src = event.getSource();
@@ -131,6 +154,19 @@ public class Generate extends MockProvider {
 				mock.deactivate();
 			}
 			
+		}
+		
+		public void dispatchStreamRemovedEvent(StreamRemovedEvent event) {
+			
+			String srcfid = event.getSrcfid();
+			String strid = event.getStrid();
+			
+			Status status = gpdvizClient.removeStream(MOCK_SSID, srcfid, strid);
+			
+			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcfid+ "/" +strid+ ": " +status);
+			if ( ! status.equals(Status.SUCCESS_OK) ) {
+				mock.deactivate();
+			}
 		}
 		
 		public void dispatchNewValueEvent(NewValueEvent event) {
@@ -168,7 +204,7 @@ public class Generate extends MockProvider {
 		public void dispatchSensorSystemUnregisteredEvent(SensorSystemUnregisteredEvent event) {
 			// Not meaningful here
 		}
-		
+
 	}
 }
 

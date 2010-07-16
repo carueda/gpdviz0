@@ -52,17 +52,17 @@ public class SensorSystemResource extends BaseResource {
 	 */
 	@Put
 	public void storeItem(Representation entity) throws IOException {
+		Form form = new Form(entity);
+		
 		// The PUT request updates or creates the resource.
-		if (ss == null) {
-			ss = new SensorSystem(ssid);
-			gpdvizManager.register(ss);
-		}
-		else {
+		if (ss != null) {
 			ss.reset();
+			ss.setDescription(form.getFirstValue("description"));
+			setStatus(Status.SUCCESS_OK);
+			return;
 		}
 
-		// Update the description.
-		Form form = new Form(entity);
+		ss = new SensorSystem(ssid);
 		ss.setDescription(form.getFirstValue("description"));
 
 		if ( gpdvizManager.registerIfAbsent(ss) == null) {

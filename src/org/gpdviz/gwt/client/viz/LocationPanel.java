@@ -40,5 +40,9 @@ public class LocationPanel {
 		sources.add(srcPanel.getWidget());
 	}
     
+	public void removeSourcePanel(SourcePanel srcPanel) {
+		sources.remove(srcPanel.getWidget());
+	}
+	
 }
 

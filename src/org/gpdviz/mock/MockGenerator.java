@@ -6,10 +6,10 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.gpdviz.ss.event.IvEventListener;
 import org.gpdviz.ss.SensorSystem;
 import org.gpdviz.ss.Source;
 import org.gpdviz.ss.Stream;
+import org.gpdviz.ss.event.IvEventListener;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 
 
@@ -18,6 +18,9 @@ import org.gpdviz.ss.event.SensorSystemResetEvent;
  * @author Carlos Rueda
  */
 class MockGenerator {
+	
+	// Not yet testing removals
+	private static final boolean DO_REMOVALS = false;
 
 	// timer attributes:
 	private static final long DELAY = 2000;
@@ -144,7 +147,7 @@ class MockGenerator {
 		
 		if ( numSrcs == 0 ) {
 			// start with a source of course
-			_generateNewSourceEvent();
+			_addSource();
 			return;
 		}
 		
@@ -153,11 +156,19 @@ class MockGenerator {
 			// generating a stream for one of the sources
 			if ( random.nextDouble() < 0.2 ) {
 				// generate new source
-				_generateNewSourceEvent();
+				_addSource();
 				return;
 			}
 		}
-
+		else if ( DO_REMOVALS ) {
+			// randomly choose between removing a source or
+			// generating a stream for one of the sources
+			if ( random.nextDouble() < 0.5 ) {
+				// generate new source
+				_removeSource();
+				return;
+			}
+		}
 		// pick a random source:
 		String srcid = "src_" +random.nextInt(numSrcs);
 		Source src = srcs.get(srcid);
@@ -173,7 +184,7 @@ class MockGenerator {
 		int numStrs = strs.size();
 		if ( numStrs == 0 ) {
 			// start this source with a stream of course
-			_generateNewStreamEvent(src);
+			_addStream(src);
 			return;
 		}
 
@@ -182,17 +193,27 @@ class MockGenerator {
 			// generating a value for one of the streams
 			if ( random.nextDouble() < 0.2 ) {
 				// generate new stream
-				_generateNewStreamEvent(src);
+				_addStream(src);
 				return;
 			}
+		}
+		else if ( DO_REMOVALS ) {
+			// randomly choose between removing a stream or
+			// generating a value for one of the streams
+			if ( random.nextDouble() < 0.5 ) {
+				// generate new stream
+				_removeStream(src);
+				return;
+			}
+
 		}
 		
 		// pick a random stream and generate a value event for it
 		Stream str = strs.get(random.nextInt(numStrs));
-		_generateNewValueEvent(src, str);
+		_addValue(src, str);
 	}
 
-	private void _generateNewSourceEvent() {
+	private void _addSource() {
 		
 		Map<String, Source> srcs = ss.getSources();
 		int numSrcs = srcs.size();
@@ -207,7 +228,20 @@ class MockGenerator {
 		ss.addSource(src);
 	}
 
-	private void _generateNewStreamEvent(Source src) {
+	private void _removeSource() {
+		
+		Map<String, Source> srcs = ss.getSources();
+		int numSrcs = srcs.size();
+		if ( numSrcs == 0 ) {
+			return;
+		}
+		
+		int id = numSrcs - 1;
+		String srcfid = "src_" +id;
+		ss.removeSource(srcfid);
+	}
+	
+	private void _addStream(Source src) {
 		
 		String srcfid = src.getFullName();
 		List<Stream> strs = ss.getStreams(srcfid);
@@ -222,7 +256,22 @@ class MockGenerator {
 		ss.addStream(src, str);
 	}
 	
-	private void _generateNewValueEvent(Source src, Stream str) {
+	private void _removeStream(Source src) {
+		
+		String srcfid = src.getFullName();
+		List<Stream> strs = ss.getStreams(srcfid);
+		int numStrs = strs.size();
+		if ( numStrs == 0 ) {
+			return;
+		}
+		
+		int id = numStrs - 1;
+		
+		String strid = "str_" +id;
+		ss.removeStream(srcfid, strid);
+	}
+	
+	private void _addValue(Source src, Stream str) {
 		String value = String.valueOf(random.nextInt(1000));
 		ss.addValue(src, str, value);
 	}

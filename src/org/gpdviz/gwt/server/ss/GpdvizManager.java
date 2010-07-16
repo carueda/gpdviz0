@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 
-import org.gpdviz.gwt.server.ss.SensorSystemRegistry.SsrListener;
 import org.gpdviz.ss.event.IvEventListener;
 import org.gpdviz.ss.SensorSystem;
 import org.gpdviz.ss.SensorSystemInfo;
@@ -22,6 +21,10 @@ import org.icepush.gwt.server.ServerPushCommandContext;
  * @author Carlos Rueda
  */
 public class GpdvizManager  {
+	
+	private void _log(String msg) {
+		System.out.println("XXX " +getClass().getSimpleName()+ ": " + msg);
+	}
 
 	/**
 	 * Creates the main manager in the back-end.
@@ -30,16 +33,12 @@ public class GpdvizManager  {
 	public GpdvizManager(HttpServlet httpServlet) {
 		this.httpServlet = httpServlet;
 		
-		System.out.println(getClass().getName()+ " INIT");
+		_log("INIT");
 
 		// TODO some persistence back-end
 		_ssRegistry = new SensorSystemRegistry();
 		
-		System.out.println(getClass().getName()+ " INIT: registered sensor systems: "
-				+_ssRegistry.getRegisteredIds()
-		);
-		
-		_ssRegistry.addSsrListener(_ssrListener );
+		_log("INIT: registered sensor systems: " +_ssRegistry.getRegisteredIds());
 	}
 	
 	
@@ -55,7 +54,7 @@ public class GpdvizManager  {
 			return null;
 		}
 		
-		SensorSystemManager ssMan = SensorSystemManager.getSensorSystemManager(ss);
+		SensorSystemManager ssMan = SensorSystemManager.createSensorSystemManager(ss);
 		
 		// add the listener if not already added:
 		ssMan.addEventListener(_eventListener);
@@ -76,47 +75,51 @@ public class GpdvizManager  {
 	 */
 	private SensorSystemRegistry _ssRegistry;
 	
-	/** Listener of registration/unregistration of sensor systems */
-	private SsrListener _ssrListener = new SensorSystemRegistry.SsrListener() {
-		public void sensorSystemRegistered(SensorSystem ss) {
-			IvEvent event = new SensorSystemRegisteredEvent(ss.getSsid());
-			_eventGenerated(event);
-		}
-
-		public void sensorSystemUnregistered(SensorSystem ss) {
-			IvEvent event = new SensorSystemUnregisteredEvent(ss.getSsid());
-			_eventGenerated(event);
-		} 
-	};
-	
 
 	private IvEventListener _eventListener = new IvEventListener() {
 		public void eventGenerated(IvEvent event) {
-			_eventGenerated(event);
+			_pushEvent(event);
 		}
 	};
 
 	
-	private void _eventGenerated(IvEvent event) {
-		
+	private void _pushEvent(IvEvent event) {
 		IvCommand ivCmd = new IvCommand(event);
 		ServletContext servletContext = httpServlet.getServletContext();
 		ServerPushCommandContext spcc = ServerPushCommandContext.getInstance(servletContext);
 		if ( spcc != null && servletContext != null ) {
 			spcc.pushCommand(ivCmd, servletContext);
+			_log("_pushEvent: " +event);
 		}
-		
-		System.out.println(this.getClass().getName()+ ": " +event);
+		else {
+			_log("_pushEvent: WARNING: couldn't push command. spcc=" +spcc+ ", ctx=" +servletContext);
+		}
 	}
 
 
 	public void register(SensorSystem ss) {
 		_ssRegistry.register(ss);
+		
+		SensorSystemManager ssMan = SensorSystemManager.createSensorSystemManager(ss);
+		// add the listener if not already added:
+		ssMan.addEventListener(_eventListener);
+
+		IvEvent event = new SensorSystemRegisteredEvent(ss.getSsid(), ss.getSensorSystemInfo());
+		_pushEvent(event);
 	}
 
 
 	public SensorSystem registerIfAbsent(SensorSystem ss) {
-		return _ssRegistry.registerIfAbsent(ss);
+		SensorSystem prev = _ssRegistry.registerIfAbsent(ss);
+		
+		SensorSystemManager ssMan = SensorSystemManager.createSensorSystemManager(ss);
+		// add the listener if not already added:
+		ssMan.addEventListener(_eventListener);
+
+		IvEvent event = new SensorSystemRegisteredEvent(ss.getSsid(), ss.getSensorSystemInfo());
+		_pushEvent(event);
+
+		return prev;
 	}
 
 
@@ -124,9 +127,33 @@ public class GpdvizManager  {
 		return _ssRegistry.getSensorSystem(ssid);
 	}
 
-
+	/**
+	 * Unregisters a sensor system.
+	 * @param ssid
+	 * @return A human readable message describing the result of the operation
+	 */
 	public String unregister(String ssid) {
-		return _ssRegistry.unregister(ssid);
+		SensorSystemManager ssm = SensorSystemManager.getSensorSystemManager(ssid);
+		if ( ssm != null ) {
+			ssm.deactivate();
+			_log(ssid+ ": SensorSystemManager deactivated.");
+		}
+		
+		SensorSystem ss = _ssRegistry.unregister(ssid);
+		String msg;
+		if ( ss != null ) {
+			msg = "Sensor system unregistered";
+			IvEvent event = new SensorSystemUnregisteredEvent(ssid, msg);
+			ss.notifyEvent(event);
+		}
+		else {
+			msg = "No such sensor system registered";
+			IvEvent event = new SensorSystemUnregisteredEvent(ssid, msg);
+			event.setEventNo(-1);
+			_pushEvent(event);
+		}
+
+		return ssid+ ": " +msg;
 	}
 
 

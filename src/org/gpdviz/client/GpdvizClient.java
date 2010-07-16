@@ -121,7 +121,7 @@ public class GpdvizClient {
 
 	
 	/**
-	 * Add a source to a sensor system.
+	 * Adds a source to a sensor system.
 	 * @param ssid
 	 * @param srcid
 	 * @param description
@@ -139,6 +139,17 @@ public class GpdvizClient {
 	}
 
 	/**
+	 * Removes a source.
+	 * @param ssid
+	 * @param srcfid
+	 * @return
+	 */
+	public Status removeSource(String ssid, String srcfid) {
+		ClientResource ssResource = new ClientResource(endpoint + "/" +ssid+ "/" +srcfid);
+		return _delete(ssResource);
+	}
+	
+	/**
 	 * Add a stream to a sensor system.
 	 * @param ssid
 	 * @param srcid
@@ -152,6 +163,18 @@ public class GpdvizClient {
 		Representation rep = _getStreamRepresentation(strid, null);
 		return _post(ssResource, rep);
 		
+	}
+	
+	/**
+	 * Removes a stream from a sensor system.
+	 * @param ssid
+	 * @param srcfid
+	 * @param strid
+	 * @return
+	 */
+	public Status removeStream(String ssid, String srcfid, String strid) {
+		ClientResource ssResource = new ClientResource(endpoint + "/" +ssid+ "/" +srcfid+ "/" + strid);
+		return _delete(ssResource);
 	}
 	
 	/**
@@ -249,4 +272,17 @@ public class GpdvizClient {
 		return Status.SUCCESS_OK;
 	}
 
+	private Status _delete(ClientResource clientResource) {
+		
+		try {
+			clientResource.delete();
+		}
+		catch (ResourceException e) {
+			Status status = e.getStatus();
+			return status;
+		}
+		
+		return Status.SUCCESS_OK;
+	}
+	
 }
