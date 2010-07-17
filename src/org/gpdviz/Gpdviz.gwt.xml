@@ -35,7 +35,7 @@
 	    Replace the src attribute below with a URL that contains your key.
 	  -->
 	 <!-- script src="http://maps.google.com/maps?gwt=1&amp;file=api&amp;v=2&amp;key=???" /-->
-	 <script src="http://maps.google.com/maps?gwt=1&amp;file=api&amp;v=2&amp;key=ABQIAAAAuSSM-L5BlccPSWMiRgOeGhT-9wX3__ettXKqWsuKDpPPKQmDNhQ9am1gBUdO2D5v_19iKQuQBmqG1g" />
+	 <script src="http://maps.google.com/maps?gwt=1&amp;file=api&amp;v=2&amp;key=ABQIAAAAjFpD3CM4jXayXdphuaAichSn70VP61M39OfVT3EEZLKEXLWLDRTneEOVc2Z1OhlbWyqHkdXvCeDhyg" />
 	
 	 <!-- You can usually run under localhost without a key                           -->
 	 <!-- Set the 'sensor' parameter to true if your app makes use of an onboard
