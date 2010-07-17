@@ -1,41 +1,33 @@
 package org.gpdviz.ss.event;
 
 import org.gpdviz.ss.Source;
-import org.gpdviz.ss.Stream;
 
-public class NewStreamEvent extends IvEvent {
+public class SourceAddedEvent extends LocationEvent {
 	private static final long serialVersionUID = 1L;
 	
 	
 	private Source src;
-	private Stream str;
 	
-	NewStreamEvent() {
+	SourceAddedEvent() {
 	}
 	
-	public NewStreamEvent(String ssid, Source src, Stream str) {
-		super(ssid);
+	public SourceAddedEvent(String ssid, Source src) {
+		super(ssid, src.getStringAttribute("latitude"), src.getStringAttribute("longitude"));
 		this.src = src;
-		this.str = str;
 	}
 
 	@Override
 	public void accept(IvEventDispatcher ed) {
-		ed.dispatchNewStreamEvent(this);
+		ed.dispatchSourceAddedEvent(this);
 	}
-	
 
-	// TODO probably not an operation here.
+	
 	public Source getSource() {
 		return src;
 	}
-	
-	public Stream getStream() {
-		return str;
-	}
 
 	protected String getSuffix() {
-		return "+Str: " +str.getFullName();
+		return "+Src: " +src.getFullName()+ "@" +lat+ "," +lon;
 	}
 	
 //	@Override

@@ -30,6 +30,11 @@ public class Panels {
 		return locPanels.get(key);
 	}
 
+	public static LocationPanel removeLocationPanel(String lat, String lon) {
+		String key = lat + "," + lon;
+		return locPanels.remove(key);
+	}
+	
 	public static LocationPanel createLocationPanel(String lat, String lon, boolean scroll) {
 		LocationPanel panel = new LocationPanel(lat, lon, scroll);
 		String key = lat + "," + lon;

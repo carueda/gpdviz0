@@ -10,9 +10,9 @@ import org.gpdviz.ss.Stream;
 import org.gpdviz.ss.event.IvEvent;
 import org.gpdviz.ss.event.IvEventDispatcher;
 import org.gpdviz.ss.event.IvEventListener;
-import org.gpdviz.ss.event.NewSourceEvent;
-import org.gpdviz.ss.event.NewStreamEvent;
-import org.gpdviz.ss.event.NewValueEvent;
+import org.gpdviz.ss.event.SourceAddedEvent;
+import org.gpdviz.ss.event.StreamAddedEvent;
+import org.gpdviz.ss.event.ValueAddedEvent;
 import org.gpdviz.ss.event.SensorSystemRegisteredEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 import org.gpdviz.ss.event.SensorSystemUnregisteredEvent;
@@ -46,8 +46,6 @@ public class Generate extends MockProvider {
 		mock.setMaxSources(MOCK_MAX_SOURCES);
 		mock.setMaxStreamsPerSource(MOCK_MAX_STREAMS_PER_SOURCE);
 		mock.setPeriod(MOCK_PERIOD);
-		mock.setResetPeriod(MOCK_RESET_PERIOD);
-		
 		
 		StringWriter writer = new StringWriter();
 		Status status = gpdvizClient.getSensorSystem(MOCK_SSID, writer);
@@ -58,7 +56,7 @@ public class Generate extends MockProvider {
 			
 			_log("ALREADY registered.  Resetting...");
 			
-			status = gpdvizClient.resetSensorSystem(MOCK_SSID, mock.getDescription());
+			status = gpdvizClient.resetSensorSystem(MOCK_SSID, mock.getSensorSystem().getDescription());
 			
 			_log("RESET: " +MOCK_SSID+ ": " +status);
 			if ( ! status.equals(Status.SUCCESS_OK) ) {
@@ -67,7 +65,7 @@ public class Generate extends MockProvider {
 		}
 		else {
 			// Not yet registered. Register:
-			status = gpdvizClient.registerSensorSystem(MOCK_SSID , mock.getDescription());
+			status = gpdvizClient.registerSensorSystem(MOCK_SSID , mock.getSensorSystem().getDescription());
 			_log("REGISTER: " +MOCK_SSID+ ": " +status);
 			if ( ! status.equals(Status.SUCCESS_OK) ) {
 				return;
@@ -76,7 +74,7 @@ public class Generate extends MockProvider {
 		
 		_log("Activating provider...");
 		
-		mock.addEventListener(new IvEventListener() {
+		mock.getSensorSystem().addEventListener(new IvEventListener() {
 			public void eventGenerated(IvEvent event) {
 				event.accept(myDispatcher);
 			}
@@ -93,6 +91,7 @@ public class Generate extends MockProvider {
 		Timer terminate = new Timer("terminate demo");
 		terminate.schedule(new TimerTask() {
 			public void run() {
+				mock.deactivate();
 				_log("Time to stop the demo");
 				try {
 					Status status = gpdvizClient.unregisterSensorSystem(MOCK_SSID);
@@ -115,7 +114,7 @@ public class Generate extends MockProvider {
 	 */
 	private class MyDispatcher implements IvEventDispatcher {
 		
-		public void dispatchNewSourceEvent(NewSourceEvent event) {
+		public void dispatchSourceAddedEvent(SourceAddedEvent event) {
 			
 			String srcid = event.getSource().getName();
 			String latitude = event.getLat();
@@ -124,24 +123,19 @@ public class Generate extends MockProvider {
 			
 			Status status = gpdvizClient.addNewSource(MOCK_SSID, srcid, description, latitude, longitude);
 			
-			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcid+ ": " +status);
-			if ( ! status.equals(Status.SUCCESS_OK) ) {
-				mock.deactivate();
-			}
+			String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
+			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcid+ ": " +status +error);
 		}
 		
 		public void dispatchSourceRemovedEvent(SourceRemovedEvent event) {
 			String srcfid = event.getSrcfid();
 			Status status = gpdvizClient.removeSource(MOCK_SSID, srcfid);
 			
-			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcfid+ ": " +status);
-			if ( ! status.equals(Status.SUCCESS_OK) ) {
-				mock.deactivate();
-			}			
+			String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
+			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcfid+ ": " +status +error);
 		}
 		
-		public void dispatchNewStreamEvent(NewStreamEvent event) {
-			
+		public void dispatchStreamAddedEvent(StreamAddedEvent event) {
 			Source src = event.getSource();
 			Stream str = event.getStream();
 			String srcid = src.getName();
@@ -149,10 +143,8 @@ public class Generate extends MockProvider {
 			
 			Status status = gpdvizClient.addNewStream(MOCK_SSID, srcid, strid);
 			
-			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcid+ "/" +strid+ ": " +status);
-			if ( ! status.equals(Status.SUCCESS_OK) ) {
-				mock.deactivate();
-			}
+			String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
+			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcid+ "/" +strid+ ": " +status +error);
 			
 		}
 		
@@ -163,33 +155,28 @@ public class Generate extends MockProvider {
 			
 			Status status = gpdvizClient.removeStream(MOCK_SSID, srcfid, strid);
 			
-			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcfid+ "/" +strid+ ": " +status);
-			if ( ! status.equals(Status.SUCCESS_OK) ) {
-				mock.deactivate();
-			}
+			String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
+			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcfid+ "/" +strid+ ": " +status +error);
 		}
 		
-		public void dispatchNewValueEvent(NewValueEvent event) {
+		public void dispatchValueAddedEvent(ValueAddedEvent event) {
 			String strid = event.getStrid();
 			String strfid = event.getStrfid();
 			String value = event.getValue();
 
 			Status status = gpdvizClient.addNewValue(MOCK_SSID, strid, strfid, value);
 			
-			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ ": " +strfid+ ": " +value+ " : " +status);
-			if ( ! status.equals(Status.SUCCESS_OK) ) {
-				mock.deactivate();
-			}
+			String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
+			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ ": " +strfid+ ": " +value+ " : " +status +error);
 		}
 		
 		public void dispatchSensorSystemResetEvent(SensorSystemResetEvent event) {
 			try {
 				Status status;
-				status = gpdvizClient.resetSensorSystem(MOCK_SSID, mock.getDescription());
-				_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ ": " +status);
-				if ( ! status.equals(Status.SUCCESS_OK) ) {
-					mock.deactivate();
-				}
+				status = gpdvizClient.resetSensorSystem(MOCK_SSID, mock.getSensorSystem().getDescription());
+				
+				String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
+				_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ ": " +status +error);
 			}
 			catch (IOException e) {
 				// TODO Auto-generated catch block

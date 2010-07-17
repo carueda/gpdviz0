@@ -1,16 +1,16 @@
 package org.gpdviz.ss.event;
 
-public class NewValueEvent extends IvEvent {
+public class ValueAddedEvent extends IvEvent {
 	private static final long serialVersionUID = 1L;
 	
 	private String strid;
 	private String strfid;
 	private String value;
 	
-	NewValueEvent() {
+	ValueAddedEvent() {
 	}
 	
-	public NewValueEvent(String ssid, String strid, String strfid, String value) {
+	public ValueAddedEvent(String ssid, String strid, String strfid, String value) {
 		super(ssid);
 		this.strid = strid;
 		this.strfid = strfid;
@@ -19,7 +19,7 @@ public class NewValueEvent extends IvEvent {
 
 	@Override
 	public void accept(IvEventDispatcher ed) {
-		ed.dispatchNewValueEvent(this);
+		ed.dispatchValueAddedEvent(this);
 	}
 
 	protected String getSuffix() {

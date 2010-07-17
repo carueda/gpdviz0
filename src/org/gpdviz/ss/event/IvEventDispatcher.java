@@ -11,12 +11,12 @@ public interface IvEventDispatcher {
 	void dispatchSensorSystemUnregisteredEvent(SensorSystemUnregisteredEvent event);
 	void dispatchSensorSystemResetEvent(SensorSystemResetEvent sensorSystemResetEvent);
 	
-	void dispatchNewSourceEvent(NewSourceEvent event);
+	void dispatchSourceAddedEvent(SourceAddedEvent event);
 	void dispatchSourceRemovedEvent(SourceRemovedEvent event);
 	
-	void dispatchNewStreamEvent(NewStreamEvent event);
+	void dispatchStreamAddedEvent(StreamAddedEvent event);
 	void dispatchStreamRemovedEvent(StreamRemovedEvent event);
 	
-	void dispatchNewValueEvent(NewValueEvent event);
+	void dispatchValueAddedEvent(ValueAddedEvent event);
 	
 }

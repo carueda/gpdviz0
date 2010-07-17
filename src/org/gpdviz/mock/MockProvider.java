@@ -12,15 +12,14 @@ public class MockProvider  {
 
 	static final String DEFAULT_GPDVIZ_ENDPOINT = "http://127.0.0.1:8888/rest";
 	
+	static final int MOCK_MAX_SOURCES = 3;
+	static final int MOCK_MAX_STREAMS_PER_SOURCE = 2;
+	static final int MOCK_PERIOD = 1000;
+	
 	// sensor system id and description
 	static final String MOCK_SSID = "mock1";
 	static final String MOCK_DESCRIPTION = "a mock data provider";
 	
-	static final int MOCK_MAX_SOURCES = 3;
-	static final int MOCK_MAX_STREAMS_PER_SOURCE = 2;
-	static final int MOCK_PERIOD = 1000;
-	static final int MOCK_RESET_PERIOD = 0;
-
 	
 	GpdvizClient gpdvizClient;
 

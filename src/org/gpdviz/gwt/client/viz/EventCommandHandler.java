@@ -7,9 +7,9 @@ import org.gpdviz.ss.Stream;
 import org.gpdviz.ss.event.IvCommand;
 import org.gpdviz.ss.event.IvEvent;
 import org.gpdviz.ss.event.IvEventDispatcher;
-import org.gpdviz.ss.event.NewSourceEvent;
-import org.gpdviz.ss.event.NewStreamEvent;
-import org.gpdviz.ss.event.NewValueEvent;
+import org.gpdviz.ss.event.SourceAddedEvent;
+import org.gpdviz.ss.event.StreamAddedEvent;
+import org.gpdviz.ss.event.ValueAddedEvent;
 import org.gpdviz.ss.event.SensorSystemRegisteredEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 import org.gpdviz.ss.event.SensorSystemUnregisteredEvent;
@@ -59,7 +59,7 @@ class EventCommandHandler implements ICommandExecuter, IvEventDispatcher {
 		});
 	}
 	
-	public void dispatchNewSourceEvent(final NewSourceEvent event) {
+	public void dispatchSourceAddedEvent(final SourceAddedEvent event) {
 		_debugEvent(event);
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
@@ -80,7 +80,7 @@ class EventCommandHandler implements ICommandExecuter, IvEventDispatcher {
 		});
 	}
 
-	public void dispatchNewStreamEvent(final NewStreamEvent event) {
+	public void dispatchStreamAddedEvent(final StreamAddedEvent event) {
 		_debugEvent(event);
 		
 		DeferredCommand.addCommand(new Command() {
@@ -104,7 +104,7 @@ class EventCommandHandler implements ICommandExecuter, IvEventDispatcher {
 	}
 		
 
-	public void dispatchNewValueEvent(final NewValueEvent event) {
+	public void dispatchValueAddedEvent(final ValueAddedEvent event) {
 		_debugEvent(event);
 		
 		DeferredCommand.addCommand(new Command() {

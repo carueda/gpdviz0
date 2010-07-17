@@ -17,7 +17,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -30,13 +29,13 @@ public class VizPanel extends VerticalPanel {
 	private final GpdvizServiceAsync gpdvizService;
 	private final String ssid;
 	private Label descriptionLabel = new Label("");
-	private Label statusLabel = new Label("event");
+	private HTML statusLabel = new HTML("event");
 	
 	private HorizontalPanel gmapPanel = new HorizontalPanel();
 	private GMap gmap;
     
 	// used when no gmap:
-	private final Panel adhocPanel = new HorizontalPanel();
+	private final LocationsPanel locsPanel = new LocationsPanel();
 	
 	private final MessagesPopup messages = new MessagesPopup();
 
@@ -63,7 +62,7 @@ public class VizPanel extends VerticalPanel {
 		add(statusPanel);
 		
     	add(gmapPanel);
-    	add(adhocPanel);
+    	add(locsPanel.getWidget());
     	
 		// map:
     	if ( useGmap ) {
@@ -82,8 +81,8 @@ public class VizPanel extends VerticalPanel {
 		if ( gmap != null ) {
 			gmap.clear();
 		}
-		else if ( adhocPanel != null ) {
-			adhocPanel.clear();
+		else if ( locsPanel != null ) {
+			locsPanel.clear();
 		}
 		Panels.reset();
 		setStatus("RESET");
@@ -95,8 +94,8 @@ public class VizPanel extends VerticalPanel {
 		Gpdviz.log(this.getClass().getName()+ ": unregister: " +ssid);
 	}
 	
-	void setStatus(String string) {
-		statusLabel.setText(string);
+	private void setStatus(String string) {
+		statusLabel.setHTML(string);
 	}
 	
 	public void addSource(Source src) {
@@ -140,6 +139,12 @@ public class VizPanel extends VerticalPanel {
 			return;
 		}
 		locPanel.removeSourcePanel(srcPanel);
+		
+		if ( locPanel.getNumberOfSourcePanels() == 0 ) {
+			// remove the location panel
+			Panels.removeLocationPanel(lat, lon);
+			_removeLoc(lat, lon);
+		}
 	}
 	
 	private void _addLoc(String lat, String lon, Widget widget) {
@@ -147,13 +152,10 @@ public class VizPanel extends VerticalPanel {
 			gmap.addLoc(lat, lon, widget);
 		}
 		else {
-			VerticalPanel vp = new VerticalPanel();
-			vp.setBorderWidth(1);
-			adhocPanel.add(vp);
-			vp.add(new Label("Add location: lat,lon=" +lat+ "," +lon));
-			vp.add(widget);
+			locsPanel.addLoc(lat, lon, widget);
 		}
 	}
+
 	private void _updateLoc(String lat, String lon, Widget widget) {
 		if ( gmap != null ) {
 			gmap.updateLoc(lat, lon, widget);
@@ -163,6 +165,14 @@ public class VizPanel extends VerticalPanel {
 		}
 	}
 
+	private void _removeLoc(String lat, String lon) {
+		if ( gmap != null ) {
+			gmap.removeLoc(lat, lon);
+		}
+		else {
+			locsPanel.removeLoc(lat, lon);
+		}
+	}
 
 
 	public void addStream(Stream str) {
@@ -184,7 +194,7 @@ public class VizPanel extends VerticalPanel {
         strPanel.update();
         
         // open chart immediately if we are using the ad hoc panel OR if first stream: 
-        if ( adhocPanel != null || Panels.getNumberOfStreamPanels() == 1 ) {
+        if ( locsPanel != null || Panels.getNumberOfStreamPanels() == 1 ) {
         	strPanel.openChart();	
         }
         
@@ -205,7 +215,7 @@ public class VizPanel extends VerticalPanel {
 		}
 		
 		// TODO
-		String strfid = srcfid+ "/";
+		String strfid = srcfid+ "/" +strid;
 		
 		// now create the stream panel
 		StreamPanel strPanel = Panels.getStreamPanel(strfid);
@@ -237,7 +247,7 @@ public class VizPanel extends VerticalPanel {
 		gpdvizService.connect(ssid, new AsyncCallback<SensorSystemInfo>() {
 
 			public void onFailure(Throwable caught) {
-				setStatus("ERROR: " +caught.getClass().getName()+ ": " +caught.getMessage());
+				setStatus("<font color=\"red\">" +"ERROR" +":</font> " +caught.getClass().getName()+ ": " +caught.getMessage());
 			}
 
 			public void onSuccess(SensorSystemInfo ssi) {
@@ -258,12 +268,12 @@ public class VizPanel extends VerticalPanel {
 
 		if ( ssi == null ) {
 			descriptionLabel.setText("?");
-			setStatus(ssid+ ": sensor system not currently registered. Waiting for registration event...");
+			setStatus("<font color=\"red\">" +ssid+ "</font>: sensor system not currently registered. Waiting for registration event...");
 			return;
 		}
 
 		descriptionLabel.setText("Sensor system: " +ssid+ ": " +ssi.getDescription());
-		setStatus(ssid+ ": waiting for updates...");
+		setStatus("<b>" +ssid+ "</b>: waiting for updates...");
 		
 		// initialize interface with obtained sensor system info:
 		

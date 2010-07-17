@@ -2,7 +2,6 @@ package org.gpdviz.gwt.client.viz;
 
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,7 +14,7 @@ public class LocationPanel {
 	
 	private VerticalPanel widget = new VerticalPanel();
 	
-	private Panel sources = new HorizontalPanel();
+	private HorizontalPanel sources = new HorizontalPanel();
 	private ScrollPanel sourcesScrollPanel = new ScrollPanel(sources);
  
     public LocationPanel(String lat, String lon, boolean scroll) {
@@ -42,6 +41,10 @@ public class LocationPanel {
     
 	public void removeSourcePanel(SourcePanel srcPanel) {
 		sources.remove(srcPanel.getWidget());
+	}
+	
+	public int getNumberOfSourcePanels() {
+		return sources.getWidgetCount();
 	}
 	
 }

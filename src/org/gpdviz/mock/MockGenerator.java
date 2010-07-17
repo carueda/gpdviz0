@@ -9,18 +9,16 @@ import java.util.TimerTask;
 import org.gpdviz.ss.SensorSystem;
 import org.gpdviz.ss.Source;
 import org.gpdviz.ss.Stream;
-import org.gpdviz.ss.event.IvEventListener;
-import org.gpdviz.ss.event.SensorSystemResetEvent;
 
 
 /**
- * Generator of a mock sensor system
+ * Generates a sensor system with random sources, streams, and values.
  * @author Carlos Rueda
  */
 class MockGenerator {
 	
-	// Not yet testing removals
-	private static final boolean DO_REMOVALS = false;
+	// probability to do removals
+	private static final double PROB_REMOVALS = 0.5;
 
 	// timer attributes:
 	private static final long DELAY = 2000;
@@ -31,9 +29,6 @@ class MockGenerator {
 	private static final int DEFAULT_MAX_STREAMS_PER_SOURCE = 8;
 	private static final int DEFAULT_MAX_LATS = 5;
 	private static final int DEFAULT_MAX_LONS = 5;
-	
-	// no reset by default
-	private static final int DEFAULT_RESET_PERIOD = 0;
 	
 	
 	private Timer timer;
@@ -46,24 +41,22 @@ class MockGenerator {
 
 	private long period = DEFAULT_PERIOD;
 	
-	private int resetPeriod = DEFAULT_RESET_PERIOD;
-
 	private Random random = new Random();
 
 	
 	private SensorSystem ss;
+
+	private int _nextSrcNum = 0;
+	private int _nextStrNum = 0;
+	
 	
 	public MockGenerator(String ssid, String description) {
 		ss = new SensorSystem(ssid);
 		ss.setDescription(description);
 	}
 	
-	public String getDescription() {
-		return ss.getDescription();
-	}
-
-	public void addEventListener(IvEventListener ivEventListener) {
-		ss.addEventListener(ivEventListener);
+	public SensorSystem getSensorSystem() {
+		return ss;
 	}
 
 	
@@ -74,16 +67,6 @@ class MockGenerator {
 		this.period = period;
 	}
 	
-	/**
-	 * Sets the reset period, ie, every resetPeriod events, a 
-	 * {@link SensorSystemResetEvent} is generated.
-	 * 
-	 * @param resetPeriod If 0, no reset event is generated.
-	 */
-	public void setResetPeriod(int resetPeriod) {
-		this.resetPeriod = resetPeriod;
-	}
-
 	public void setMaxSources(int maxSources) {
 		this.maxSources = maxSources;
 	}
@@ -97,10 +80,6 @@ class MockGenerator {
 		this.maxLons = maxLons;
 	}
 
-	public boolean isActive() {
-		return timer != null ;
-	}
-	
 	public synchronized void activate() {
 		if ( timer != null ) {
 			return;
@@ -108,7 +87,7 @@ class MockGenerator {
 		
 		TimerTask task = new TimerTask() {
 			public void run() {
-				refreshState();
+				_generateEvent();
 			}
 		};
 		timer = new Timer(this.getClass().getSimpleName()+ " timer");
@@ -125,22 +104,9 @@ class MockGenerator {
 	
 
 	/**
-	 * Runs the scanning of information eventually
-	 * generating events and updating the current state.
+	 * Called by the timer to generate an event.
 	 */
-	protected void refreshState() {
-		
-		int _nextEventNo = ss.getNumEvents();
-		
-		if ( resetPeriod > 0 && _nextEventNo > 0 && _nextEventNo % resetPeriod == 0 ) {
-			ss.reset();
-			return;
-		}
-		
-		double rdm = random.nextDouble();
-		if ( rdm < 0.1 ) {
-			return; // no event
-		}
+	private void _generateEvent() {
 		
 		Map<String, Source> srcs = ss.getSources();
 		int numSrcs = srcs.size();
@@ -151,7 +117,7 @@ class MockGenerator {
 			return;
 		}
 		
-		if ( numSrcs < maxSources ) {
+		else if ( numSrcs < maxSources ) {
 			// randomly choose between generating a new source or
 			// generating a stream for one of the sources
 			if ( random.nextDouble() < 0.2 ) {
@@ -160,35 +126,37 @@ class MockGenerator {
 				return;
 			}
 		}
-		else if ( DO_REMOVALS ) {
+		else if ( PROB_REMOVALS > 0.0 ) {
 			// randomly choose between removing a source or
-			// generating a stream for one of the sources
-			if ( random.nextDouble() < 0.5 ) {
+			// generating an event for a randomly chosen source:
+			if ( random.nextDouble() < PROB_REMOVALS ) {
 				// generate new source
 				_removeSource();
 				return;
 			}
 		}
-		// pick a random source:
-		String srcid = "src_" +random.nextInt(numSrcs);
-		Source src = srcs.get(srcid);
-		assert src != null;
-
-		refreshStateSource(src);
+		
+		// pick a random source and generate an event for it:
+		int idx = random.nextInt(numSrcs);
+		Source src = (Source) srcs.values().toArray()[idx];
+		_generateEventForSource(src);
 	}
 
-	private void refreshStateSource(Source src) {
+	/**
+	 * Generates an event for the given source.
+	 */
+	private void _generateEventForSource(Source src) {
 		
 		String srcfid = src.getFullName();
 		List<Stream> strs = ss.getStreams(srcfid);
 		int numStrs = strs.size();
 		if ( numStrs == 0 ) {
-			// start this source with a stream of course
+			// start this source with a stream:
 			_addStream(src);
 			return;
 		}
 
-		if ( numStrs < maxStreamsPerSource ) {
+		else if ( numStrs < maxStreamsPerSource ) {
 			// randomly choose between generating a new stream or
 			// generating a value for one of the streams
 			if ( random.nextDouble() < 0.2 ) {
@@ -197,10 +165,10 @@ class MockGenerator {
 				return;
 			}
 		}
-		else if ( DO_REMOVALS ) {
+		else if ( PROB_REMOVALS > 0.0 ) {
 			// randomly choose between removing a stream or
 			// generating a value for one of the streams
-			if ( random.nextDouble() < 0.5 ) {
+			if ( random.nextDouble() < PROB_REMOVALS ) {
 				// generate new stream
 				_removeStream(src);
 				return;
@@ -213,36 +181,55 @@ class MockGenerator {
 		_addValue(src, str);
 	}
 
+	/**
+	 * Adds a source to the sensor system.
+	 */
 	private void _addSource() {
-		
 		Map<String, Source> srcs = ss.getSources();
 		int numSrcs = srcs.size();
 		if ( numSrcs == maxSources ) {
 			return;
 		}
 		
-		String srcid = "src_" +numSrcs;
+		String srcid = _getNextSourceId();
 		String lat = "" +( 10 * random.nextInt(maxLats));
 		String lon = "" +( 10 * random.nextInt(maxLons));
 		Source src = new Source(srcid, srcid, "TODO: descriptive location", lat, lon);
 		ss.addSource(src);
 	}
 
+	private String _getNextSourceId() {
+		String srcid = "src_" +_nextSrcNum ;
+		_nextSrcNum++;
+		return srcid;
+	}
+
+	private String _getNextStreamId() {
+		String strid = "src_" +_nextStrNum ;
+		_nextStrNum++;
+		return strid;
+	}
+	
+	/**
+	 * Removes a source.
+	 */
 	private void _removeSource() {
-		
 		Map<String, Source> srcs = ss.getSources();
 		int numSrcs = srcs.size();
 		if ( numSrcs == 0 ) {
 			return;
 		}
 		
-		int id = numSrcs - 1;
-		String srcfid = "src_" +id;
+		int idx = random.nextInt(numSrcs);
+		Source src = (Source) srcs.values().toArray()[idx];
+		String srcfid = src.getFullName();
 		ss.removeSource(srcfid);
 	}
 	
+	/**
+	 * Adds a stream to the given source.
+	 */
 	private void _addStream(Source src) {
-		
 		String srcfid = src.getFullName();
 		List<Stream> strs = ss.getStreams(srcfid);
 		int numStrs = strs.size();
@@ -250,12 +237,15 @@ class MockGenerator {
 			return;
 		}
 		
-		String strid = "str_" +numStrs;
+		String strid = _getNextStreamId();
 		String strfid = srcfid+ "/" +strid;
 		Stream str = new Stream(strid, strfid, 1000, "UNITS");
 		ss.addStream(src, str);
 	}
 	
+	/**
+	 * Removes a stream from the given source.
+	 */
 	private void _removeStream(Source src) {
 		
 		String srcfid = src.getFullName();
@@ -265,16 +255,17 @@ class MockGenerator {
 			return;
 		}
 		
-		int id = numStrs - 1;
-		
-		String strid = "str_" +id;
+		int idx = random.nextInt(numStrs);
+		Stream str = strs.get(idx);
+		String strid = str.getName();
 		ss.removeStream(srcfid, strid);
 	}
 	
+	/**
+	 * Adds a value to the given stream.
+	 */
 	private void _addValue(Source src, Stream str) {
 		String value = String.valueOf(random.nextInt(1000));
 		ss.addValue(src, str, value);
 	}
-
-
 }

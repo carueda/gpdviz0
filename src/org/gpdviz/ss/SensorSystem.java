@@ -5,9 +5,9 @@ import java.util.Map;
 
 import org.gpdviz.ss.event.IvEvent;
 import org.gpdviz.ss.event.IvEventListener;
-import org.gpdviz.ss.event.NewSourceEvent;
-import org.gpdviz.ss.event.NewStreamEvent;
-import org.gpdviz.ss.event.NewValueEvent;
+import org.gpdviz.ss.event.SourceAddedEvent;
+import org.gpdviz.ss.event.StreamAddedEvent;
+import org.gpdviz.ss.event.ValueAddedEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 import org.gpdviz.ss.event.SourceRemovedEvent;
 import org.gpdviz.ss.event.StreamRemovedEvent;
@@ -52,7 +52,7 @@ public class SensorSystem {
 
 	public void addSource(Source src) {
 		sensorSystemInfo.addSource(src);
-		IvEvent event = new NewSourceEvent(ssid, src);
+		IvEvent event = new SourceAddedEvent(ssid, src);
 		notifyEvent(event);
 	}
 	
@@ -64,7 +64,7 @@ public class SensorSystem {
 	
 	public void addStream(Source src, Stream str) {
 		sensorSystemInfo.addStream(str);
-		IvEvent event = new NewStreamEvent(ssid, src, str);
+		IvEvent event = new StreamAddedEvent(ssid, src, str);
 		notifyEvent(event);
 	}
 	
@@ -81,7 +81,7 @@ public class SensorSystem {
 		String strid = str.getName();
 		String strfid = str.getFullName();
 		sensorSystemInfo.addValue(strfid, value);
-		IvEvent event = new NewValueEvent(ssid, strid, strfid, value);
+		IvEvent event = new ValueAddedEvent(ssid, strid, strfid, value);
 		notifyEvent(event);
 	}
 	

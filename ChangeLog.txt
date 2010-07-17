@@ -7,7 +7,12 @@ ChangeLog
 	- Handling of REGISTER and UNREGISTER events. The visualizer can now be started with
 	  an unregistered sensor system; it will automatically react to the registration event.
 	  
-	- indicate &_log=y in URL to include some logging in the window.
+	- indicate &_log=yes in URL to include some logging in the window.
+	
+	- Visualization: updates complete upon removal of streams, sources, and locations.
+	- MockGenerator now also generates removal events.
+	
+	- Several class/method renamings for better consistency.
 	
 2010-07-15
 	- Using build.properties (via sample.build.properties) to facilitate build

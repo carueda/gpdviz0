@@ -60,6 +60,12 @@ public class GMap {
 		return marker;
 	}
 	
+	private Marker removeMarker(String slat, String slon) {
+		String key = slat+ "," +slon;
+		Marker marker = markers.get(key);
+		return marker;
+	}
+	
 	private Marker createMarker(String slat, String slon) {
 		String key = slat+ "," +slon;
 		
@@ -115,6 +121,14 @@ public class GMap {
 		}
 	}
 	
+	public void removeLoc(String slat, String slon) {
+		Marker marker = removeMarker(slat, slon);
+		if ( marker != null ) {
+			map.removeOverlay(marker);
+		}
+	}
+
+
 	
 	public Widget getWidget() {
 		return widget;
