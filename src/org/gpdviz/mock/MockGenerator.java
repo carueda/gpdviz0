@@ -18,7 +18,7 @@ import org.gpdviz.ss.Stream;
 class MockGenerator {
 	
 	// probability to do removals
-	private static final double PROB_REMOVALS = 0.5;
+	private static final double PROB_REMOVALS = 0.2;
 
 	// timer attributes:
 	private static final long DELAY = 2000;
