@@ -96,9 +96,6 @@ public class Generate extends MockProvider {
 				try {
 					Status status = gpdvizClient.unregisterSensorSystem(MOCK_SSID);
 					_log("UNREGISTER" + ": " +status);
-					
-					// allow some time before exiting the program:
-					Thread.sleep(2000);
 				}
 				catch (Exception e) {
 					// TODO Auto-generated catch block

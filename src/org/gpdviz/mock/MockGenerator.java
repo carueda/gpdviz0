@@ -205,7 +205,7 @@ class MockGenerator {
 	}
 
 	private String _getNextStreamId() {
-		String strid = "src_" +_nextStrNum ;
+		String strid = "str_" +_nextStrNum ;
 		_nextStrNum++;
 		return strid;
 	}
