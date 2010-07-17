@@ -62,7 +62,7 @@ public class GMap {
 	
 	private Marker removeMarker(String slat, String slon) {
 		String key = slat+ "," +slon;
-		Marker marker = markers.get(key);
+		Marker marker = markers.remove(key);
 		return marker;
 	}
 	
@@ -88,15 +88,19 @@ public class GMap {
 		final Marker marker = createMarker(slat, slon);
 		map.addOverlay(marker);
 		
+		final InfoWindowContent ic = new InfoWindowContent(content);
+		
 		marker.addMarkerClickHandler(new MarkerClickHandler() {
 			public void onClick(MarkerClickEvent e) {
-				InfoWindowContent ic = new InfoWindowContent(content);
 				map.getInfoWindow().open(marker.getLatLng(), ic);
 			}
 		});
 		
 		if ( ! map.getInfoWindow().isVisible() ) {
+			// pan to marker
 			map.panTo(marker.getLatLng());
+			// and open infoWindow
+			map.getInfoWindow().open(marker.getLatLng(), ic);
 		}
 	}
 
@@ -125,6 +129,17 @@ public class GMap {
 		Marker marker = removeMarker(slat, slon);
 		if ( marker != null ) {
 			map.removeOverlay(marker);
+			
+			// close infoWindow if it's the one associated with this marker:
+			LatLng infoWindowPoint = map.getInfoWindow().getPoint();
+			if ( infoWindowPoint.isEquals(marker.getLatLng()) ) {
+				DeferredCommand.addCommand(new Command() {
+					public void execute() {
+						map.getInfoWindow().close();
+					}
+				});
+			}
+
 		}
 	}
 

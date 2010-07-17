@@ -4,15 +4,20 @@ Carlos Rueda - MBARI
 ChangeLog
 
 2010-07-17
-    Re mmisw.org deployment:
-	- Upon warning from Google Maps about code not being valid, I generated a new API key:
+	- GMap: fixed removal of marker (was calling markers.get instead of markers.remove);
+	        Now infoWindow immediately open upon addition of location if not already open.
+	  ``ant simple-client'' with google maps runs smoothly ;) 
+	         
+    - Re mmisw.org deployment:
+	  Upon warning from Google Maps about code not being valid, I generated a new API key:
 	  http://code.google.com/apis/maps/signup.html 
 	  -> ABQIAAAAjFpD3CM4jXayXdphuaAichSn70VP61M39OfVT3EEZLKEXLWLDRTneEOVc2Z1OhlbWyqHkdXvCeDhyg
 	  
 	  This is the old one: ABQIAAAAuSSM-L5BlccPSWMiRgOeGhT-9wX3__ettXKqWsuKDpPPKQmDNhQ9am1gBUdO2D5v_19iKQuQBmqG1g
 	  which I think I created for mmisw.org as well(?).
 	  
-	- TODO: Include a build property re the google map api key to facilitate other deployments.
+	  TODO: Include a build property re the google map api key to facilitate other deployments.
+	
 	  
 2010-07-16
 	- Handling of REGISTER and UNREGISTER events. The visualizer can now be started with
