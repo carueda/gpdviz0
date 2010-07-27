@@ -25,46 +25,46 @@ servlet container to deploy and run Gpdviz.
 
 == Building and running ==
  
-	# get a copy of the code:
+# get a copy of the code:
 	$ svn checkout http://gpdviz.googlecode.com/svn/trunk/gpdviz
 	$ cd gpdviz
-	# have your own build.properties:
-	# cp sample.build.properties build.properties
-	# edit build.properties as appropriate for your system.
+# have your own build.properties:
+	$ cp sample.build.properties build.properties
+# edit build.properties as appropriate for your system.
 	
-	# create gpdviz.war:
+# create gpdviz.war:
 	$ ant war
-	# creates _generated/gpdviz.war. If this is deployed such that the Web interface is located at
-	# http://localhost:8080/gpdviz, then the Gpdviz endpoint will be http://localhost:8080/gpdviz/rest
+# creates _generated/gpdviz.war. If this is deployed such that the Web interface is located at
+# http://localhost:8080/gpdviz, then the Gpdviz endpoint will be http://localhost:8080/gpdviz/rest
 
-	# create client library gpdviz-client.jar:
+# create client library gpdviz-client.jar:
 	$ ant client-jar
-	# creates _generated/gpdviz-client.jar.  Client code will need this JAR as well as the
-	# Restlet JAR org.restlet.jar (a copy of this library is under war/WEB-INF/lib/)
+# creates _generated/gpdviz-client.jar.  Client code will need this JAR as well as the
+# Restlet JAR org.restlet.jar (a copy of this library is under war/WEB-INF/lib/)
 
-	# The tests below assume the endpoint http://localhost:8080/gpdviz/rest. 
-	# To indicate a different endpoint, use ``ant -Dendpoint=someURL ...''
+The tests below assume the endpoint http://localhost:8080/gpdviz/rest. 
+To indicate a different endpoint, use ``ant -Dendpoint=someURL ...''
 	  
 	$ ant simple-client
-	# runs a simple test of the client library. This registers a sensor system with ID "test1".
-	# Open http://localhost:8080/gpdviz?ssid=test1 in your browser.
-	# Then, type Enter in the console where ant is running to advance the various notifications. 
-	# See the effect on your browser.
+# runs a simple test of the client library. This registers a sensor system with ID "test1".
+# Open http://localhost:8080/gpdviz?ssid=test1 in your browser.
+# Then, type Enter in the console where ant is running to advance the various notifications. 
+# See the effect on your browser.
 
 	$ ant mock-generate
-	# runs a mock sensor system with ID "mock1".
-	# Open http://localhost:8080/gpdviz?ssid=mock1 in your browser.
-	# This sensor system runs for a couple of minutes generating various random events (new sources,
-	# streams, and values). The program will automatically unregister the sensor system and exit.
-	# If you kill the program before it finishes, call ``ant mock-unregister'' to unregister this 
-	# sensor system.
+# runs a mock sensor system with ID "mock1".
+# Open http://localhost:8080/gpdviz?ssid=mock1 in your browser.
+# This sensor system runs for a couple of minutes generating various random events (new sources,
+# streams, and values). The program will automatically unregister the sensor system and exit.
+# If you kill the program before it finishes, call ``ant mock-unregister'' to unregister this 
+# sensor system.
 
 	$ ant mock-reset
-	# convenience target to reset the mock sensor system. Resetting means that all streams are 
-	# removed but the sensor system itself remains registered. 
+# convenience target to reset the mock sensor system. Resetting means that all streams are 
+# removed but the sensor system itself remains registered. 
 
 	$ ant mock-unregister
-	# Unregisters the mock sensor system.
+# Unregisters the mock sensor system.
 
 Open http://localhost:8080/gpdviz/rest/ to see the current registered sensor systems.
 
@@ -81,6 +81,7 @@ open http://localhost:8080/gpdviz/?ssid=test1&gmap=no&_log=yes in your browser.
 == Some TODOs ==
 - Registered sensor systems are not yet persisted.
 - Visualization features are still preliminary.
+- Allow to specify a particular source or stream for visualization
 - the REST interface is not yet documented; see the javadoc for GpdvizClient and the demo
   programs for usage details.
 (see also ChangeLog.txt)
