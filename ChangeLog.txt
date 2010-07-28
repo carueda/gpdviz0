@@ -9,7 +9,7 @@ ChangeLog
 		- remove "source" concept
 		- use "sensor system" and "stream" as main entities.  
 		- move the location (lat/lon) pair from Source to Stream.
-	    - a stream with missing lat/lon will "enherit" that of the most immediate ancestor
+		- a stream with missing lat/lon will "inherit" that of the most immediate ancestor
 		  (according to its path) with a defined lat/lon.
 		  
 	
