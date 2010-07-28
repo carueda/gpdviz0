@@ -3,6 +3,9 @@ Carlos Rueda - MBARI
 
 ChangeLog
 
+2010-07-27
+	- Some documentation in the wiki with a supporting diagram under doc/fig/
+	
 2010-07-17
 	- GMap: fixed removal of marker (was calling markers.get instead of markers.remove);
 	        Now infoWindow immediately open upon addition of location if not already open.
