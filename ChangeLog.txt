@@ -4,7 +4,14 @@ Carlos Rueda - MBARI
 ChangeLog
 
 2010-07-27
-	- Some documentation in the wiki with a supporting diagram under doc/fig/
+	- Some documentation in the wiki with a supporting diagram under doc/fig/.
+	- TODO: simplify data model even further: 
+		- remove "source" concept
+		- use "sensor system" and "stream" as main entities.  
+		- move the location (lat/lon) pair from Source to Stream.
+	    - a stream with missing lat/lon will "enherit" that of the most immediate ancestor
+		  (according to its path) with a defined lat/lon.
+		  
 	
 2010-07-17
 	- GMap: fixed removal of marker (was calling markers.get instead of markers.remove);
