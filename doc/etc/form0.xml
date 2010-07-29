@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <Module>
   <ModulePrefs title="hello world example" /> 
-  <Content type="html" href="form0.html">
+  <Content type="html">
+     <![CDATA[ 
+<form 
+    method="post"
+	action="http://localhost:8080/gpdviz/rest/">
+	
+	<input type="hidden" id="ssid" name="ssid" value="ss1" /><br />
+	
+	<input type="hidden" id="description" name="description"
+		value="description of sensor system ss1" /><br />
+	
+	<input type="submit" value="Register ss1" />
+</form>
+     ]]>
   </Content> 
 </Module>
