@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<body>
+
+<script type="text/javascript">
+	ssid = "ss1";
+	srcid = "foo";
+	latitude = "-30";
+	longitude = "-120";
+	strid = "bar";
+	winAttrs = 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=450,height=250';
+</script>
+
+<table border="1" cellpadding="3" cellspacing="0">
+<tr>
+
+<td>
+	Sensor system '<script>document.write(ssid)</script>':
+</td>
+
+<td>
+	<input
+	type="button" 
+	value="Register" 
+	onclick="javascript:window.open('dispatch.html?operation=register&ssid=' +ssid, '', winAttrs)" 
+	/>
+</td>
+
+<td>
+	<input
+	type="button" 
+	value="Unregister" 
+	onclick="javascript:window.open('dispatch.html?operation=unregister&ssid=' +ssid, '', winAttrs)" 
+	/>
+</td>
+
+<td>
+	<input 
+	type="button" 
+	value="View"
+	onclick="javascript:window.open('dispatch.html?operation=view&ssid=' +ssid, '', winAttrs)" 
+	/>
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+	Source '<script>document.write(ssid+ '/' +srcid)</script>':
+</td>
+
+<td>
+	<input 
+	type="button" 
+	value="Add" 
+	onclick="javascript:window.open('dispatch.html?operation=addsource&ssid=' +ssid+ 
+	'&srcid=' +srcid+ '&latitude=' +latitude+ '&longitude=' +longitude
+	, '', winAttrs)" 
+	/>
+</td>
+
+<td>
+	<input 
+	type="button" 
+	value="Remove" 
+	onclick="javascript:window.open('dispatch.html?operation=removesource&ssid=' +ssid+ 
+	'&srcid=' +srcid
+	, '', winAttrs)" 
+	/>
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+	Stream '<script>document.write(ssid + '/' +srcid+ '/' +strid)</script>':
+</td>
+<td>
+	<input 
+	type="button" 
+	value="Add" 
+	onclick="javascript:window.open('dispatch.html?operation=addstream&ssid=' +ssid+ 
+	'&srcid=' +srcid+ '&strid=' +strid
+	, '', winAttrs)" 
+	/>
+</td>
+
+<td>
+	<input 
+	type="button" 
+	value="Remove" 
+	onclick="javascript:window.open('dispatch.html?operation=removestream&ssid=' +ssid+ 
+	'&srcid=' +srcid+ '&strid=' +strid
+	, '', winAttrs)" 
+	/>
+</td>
+
+<td>
+	<input 
+	type="button" 
+	value="Add value" 
+	onclick="javascript:window.open('dispatch.html?operation=addvalue&ssid=' +ssid+ 
+	'&srcid=' +srcid+ '&strid=' +strid
+	, '', winAttrs)" 
+	/>
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+	All sensor streams:
+</td>
+<td>
+	<input 
+	type="button" 
+	value="View all" 
+	onclick="javascript:window.open('dispatch.html?operation=viewall', '', winAttrs)" 
+	/>
+</td>
+
+</tr>
+
+</table>
+</body>
+</html>

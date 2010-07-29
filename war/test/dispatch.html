@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>    
+<!--
+	This page dispatches some operations inmmediately based on given
+	parameters.  This is called from index.html in this directory.
+	
+	Some useful links: 
+	http://www.restlet.org/documentation/1.0/faq#19
+	http://onlamp.com/lpt/a/6480
+	http://www.w3.org/TR/XMLHttpRequest/
+	http://www.openjs.com/articles/ajax_xmlhttp_using_post.php
+	
+-->
+<script type="text/javascript">       
+
+	// To extract value of a parameter 
+	// (from http://www.netlobo.com/url_query_string_javascript.html)
+	// 
+	function gup(name) {
+		name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+		var regexS = "[\\?&]" + name + "=([^&#]*)";
+		var regex = new RegExp(regexS);
+		var results = regex.exec(window.location.href);
+		if (results == null)
+			return "";
+		else
+			return results[1];
+	}
+
+	function dispatch() {     
+		var operation = gup('operation');  
+
+		if (operation == "register") {
+			var ssid = gup('ssid'); 
+			var description = "Description of sensor system " +ssid; 
+			register(ssid, description);
+		}
+		else if (operation == "unregister") {
+			var ssid = gup('ssid'); 
+			unregister(ssid);
+		} 
+		else if (operation == "addsource") {
+			var ssid = gup('ssid');
+			var srcid = gup('srcid');
+			var description = "Description of source " +srcid; 
+			var latitude = gup('latitude');
+			var longitude = gup('longitude');
+			addsource(ssid, srcid, description, latitude, longitude);
+		}
+		else if (operation == "addstream") {
+			var ssid = gup('ssid');
+			var srcid = gup('srcid');
+			var strid = gup('strid');
+			addstream(ssid, srcid, strid);
+		}
+		else if (operation == "addvalue") {
+			var ssid = gup('ssid');
+			var srcid = gup('srcid');
+			var strid = gup('strid');
+			addvalue(ssid, srcid, strid);
+		}
+		else if (operation == "removestream") {
+			var ssid = gup('ssid');
+			var srcid = gup('srcid');
+			var strid = gup('strid');
+			removestream(ssid, srcid, strid);
+		}
+		else if (operation == "removesource") {
+			var ssid = gup('ssid');
+			var srcid = gup('srcid');
+			removesource(ssid, srcid);
+		}
+		else if (operation == "view") {
+			var ssid = gup('ssid'); 
+			view(ssid);
+		}
+		else if (operation == "viewall") {
+			viewall();
+		}
+		else {
+			document.write("operation parameter invalid or not given: " + operation);
+		}
+	}
+
+	
+	function showResponse(req) {
+		document.body.innerHTML = "Response: " +
+			req.statusText+ " (" +req.status+ ")<br/>" + 
+			req.responseText;
+	}
+
+	
+	function viewall() {
+		window.location = "../rest/"
+	}
+
+	function view(ssid) {
+		window.location = "../rest/" + ssid;
+	}
+
+	function register(ssid, description) {
+		var req = new XMLHttpRequest();
+		req.open("POST", "../rest/", false);   
+		var params = "ssid=" +ssid+ "&description=" + description;
+
+		req.send(params);
+		showResponse(req);
+	}
+
+	function unregister(ssid) {
+		var req = new XMLHttpRequest();
+		req.open("DELETE", "../rest/" + ssid, false);
+		req.send("");
+		showResponse(req);
+	}
+
+	function addsource(ssid, srcid, description, latitude, longitude) {
+		var req = new XMLHttpRequest();
+		req.open("POST", "../rest/" +ssid + "/", false);   
+		var params = "srcid=" +srcid+ "&description=" + description +
+			"&latitude=" +latitude +
+			"&longitude=" +longitude
+		;
+		req.send(params);
+		showResponse(req);
+	}
+
+	function addstream(ssid, srcid, strid) {
+		var req = new XMLHttpRequest();
+		req.open("POST", "../rest/" +ssid + "/" +srcid+ "/", false);   
+		var params = "strid=" +strid ;
+		req.send(params);
+		showResponse(req);
+	}
+
+	function addvalue(ssid, srcid, strid) {
+		var value = "" + Math.random();
+		var req = new XMLHttpRequest();
+		req.open("PUT", "../rest/" +ssid + "/" +srcid+ "/" +strid, false);   
+		var params = "value=" +value ;
+		req.send(params);
+		showResponse(req);
+	}
+
+	function removestream(ssid, srcid, strid) {
+		var req = new XMLHttpRequest();
+		req.open("DELETE", "../rest/" +ssid + "/" +srcid+ "/" + strid, false);   
+		req.send("");
+		showResponse(req);
+	}
+
+	function removesource(ssid, srcid) {
+		var req = new XMLHttpRequest();
+		req.open("DELETE", "../rest/" +ssid + "/" +srcid, false);   
+		req.send("");
+		showResponse(req);
+	}
+
+</script>
+</head>
+
+<body onLoad="dispatch()">
+
+
+</body>
+</html>

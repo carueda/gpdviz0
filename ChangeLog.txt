@@ -3,6 +3,9 @@ Carlos Rueda - MBARI
 
 ChangeLog
 
+2010-07-29
+	- war/test/ - quick html based way to test REST operations.
+	
 2010-07-28
 	- did quick investigation to see the feasibility of deploying Gpdviz on the
 	  Google App Engine. This is not possible at the moment because of the GAE
