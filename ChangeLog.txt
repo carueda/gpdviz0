@@ -3,6 +3,14 @@ Carlos Rueda - MBARI
 
 ChangeLog
 
+2010-07-28
+	- did quick investigation to see the feasibility of deploying Gpdviz on the
+	  Google App Engine. This is not possible at the moment because of the GAE
+	  restricted environment, in particular re. creation of Threads. See:
+	     http://gwteventservice.freeforums.org/gae-exception-upon-addlistener-modifythreadgroup-t26.html
+	  BTW, this gwteventservice looks interesting: http://code.google.com/p/gwteventservice/
+	     
+	     
 2010-07-27
 	- Some documentation in the wiki with a supporting diagram under doc/fig/.
 	- TODO: simplify data model even further: 
