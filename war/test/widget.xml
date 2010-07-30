@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <Module>
   <ModulePrefs title="Gpdviz test example" /> 
-  <UserPref name="endpoint" display_name="Gpdviz endpoint" required="true" />
-  <Content type="html" href="<script>document.write('index.html?' +(new gadgets.Prefs()).getString('endpoint')</script>" >
+  <Content type="html" href="index.html" >
   </Content> 
 </Module>
