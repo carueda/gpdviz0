@@ -14,10 +14,10 @@ ChangeLog
 	- org.gpdviz.ieee1451.client.Ieee1451Client provides a high-level API to get info
 	  from a IEEE1451 server.
 	- The main program Ieee1451Main registers and sets up the sensor system, ie., TIMs,
-	  channels for each TIM, and values (one value per channel).
-	  
-	TODO one possible next step is to launch a timer for each channel to continue requesting
-	and notifying new values to the Gpdviz endpoint.
+	  channels for each TIM, and, for each channel, launches a timer to continue requesting
+	  and notifying new values to the Gpdviz endpoint.
+	  The program runs for a couple of minutes finalizing with the unregistration of
+	  the sensor system, and exits automatically.
 	
 	TODO Bug found: A second client session (ant ieee1451) does not get properly
 	reflected in the visualizer even if the previous session completes normally (with the

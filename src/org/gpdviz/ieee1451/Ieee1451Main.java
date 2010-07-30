@@ -2,6 +2,8 @@ package org.gpdviz.ieee1451;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.gpdviz.client.GpdvizClient;
 import org.gpdviz.ieee1451.client.Ieee1451Client;
@@ -17,6 +19,9 @@ import org.restlet.data.Status;
  * @author Carlos Rueda
  */
 public class Ieee1451Main {
+
+	private static final long PROGRAM_DURATION_MINS = 2;
+	
 
 // From the old code in sosplot:
 //	private static Oidemo1451ContentProvider[] ncaps = {
@@ -35,6 +40,8 @@ public class Ieee1451Main {
 
 	private GpdvizClient gpdvizClient;
 	private Ieee1451Client ieee1451Client;
+	
+	private volatile boolean ncontinueRunning = true;
 	
 	private void _usage(String msg) {
 		if ( msg != null ) {
@@ -94,7 +101,7 @@ public class Ieee1451Main {
 			_usage("missing ieee1451 ncap");
 		}
 
-		String ssid = "ieee1451." +ieee1451ncap;
+		final String ssid = "ieee1451." +ieee1451ncap;
 		String ssDescription = "some description";
 		
 		gpdvizClient = new GpdvizClient(endPoint);
@@ -116,39 +123,76 @@ public class Ieee1451Main {
 
 		_prepareSensorSystem(ssid, ssDescription);
 
-		for ( String timId : tims ) {
+		for ( final String timId : tims ) {
 			_log(" tim = " +timId);
 
 			String[] latlon = ieee1451Client.getGeolocation(timId);
 			String timDescription = ieee1451Client.getTimDescription(timId);
 			
 			_pause();
-			String srcid = "tim_" +timId;
+			final String srcid = "tim_" +timId;
 			gpdvizClient.addNewSource(ssid, srcid, timDescription, latlon[0], latlon[1]);
 			
 
 			TransducerInfo[] transducerInfos = ieee1451Client.getTransducerInfos(timId);
-			for (TransducerInfo ti : transducerInfos) {
+			for (final TransducerInfo ti : transducerInfos) {
 				
 				// not used yet
 //				String chDescription = ieee1451Client.getChannelDescription(timId, ti.channelId);
 				
-				String strid = "ch_" +ti.getChannelId();
+				final String strid = "ch_" +ti.getChannelId();
 				gpdvizClient.addNewStream(ssid, srcid, strid);
 				_pause();
 				
-				DataPoint dp = ieee1451Client.getDataPoint(timId, ti.getChannelId());
+				final Timer timer = new Timer();
+				timer.scheduleAtFixedRate(new TimerTask() {
+
+					@Override
+					public void run() {
+						if ( ! ncontinueRunning ) {
+							timer.cancel();
+							return;
+						}
+						
+						try {
+							DataPoint dp = ieee1451Client.getDataPoint(timId, ti.getChannelId());
+							// millis not used yet
+//							long millis = dp.getMillis();
+							gpdvizClient.addNewValue(ssid, strid, srcid+ "/" +strid, dp.getValue());
+						}
+						catch (Exception e) {
+							e.printStackTrace();
+							timer.cancel();
+						}
+					}
+					
+				}, 1000, 10000);
 				
-				// millis not used yet
-//				long millis = dp.getMillis();
-				
-				gpdvizClient.addNewValue(ssid, strid, srcid+ "/" +strid, dp.getValue());
-				_pause();
 			}
 			
 		}
 			
-		gpdvizClient.unregisterSensorSystem(ssid);
+		// timer to terminate this demo
+		new Timer().schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				ncontinueRunning = false;
+
+				_log("Time to terminate this demo.");
+				try {
+					gpdvizClient.unregisterSensorSystem(ssid);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				System.exit(0);
+			}
+			
+		}, PROGRAM_DURATION_MINS * 60 * 1000);
+		
+		_log("This demo will exit in " +PROGRAM_DURATION_MINS+ " minutes.");
 	}
 
 	/**
