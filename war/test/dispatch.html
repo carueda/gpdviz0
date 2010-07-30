@@ -28,8 +28,20 @@
 			return results[1];
 	}
 
+	restUrl = "";
+	
+	// gets the URL of the REST endpoint. This assumes this page is
+	// located at "XXXX/test/dispatch.html" and that the rest endpoint is
+	// at "XXXX/rest".
+	function getRest() {
+		var base = window.location.protocol + "//" + window.location.host + window.location.pathname;
+		restUrl = base.substring(0, base.length - "test/dispatch.html".length) + "rest/";
+		//alert("restUrl = " +restUrl);
+	}
+
 	function dispatch() {     
 		var operation = gup('operation');  
+		getRest();
 
 		if (operation == "register") {
 			var ssid = gup('ssid'); 
@@ -92,16 +104,18 @@
 
 	
 	function viewall() {
-		window.location = "../rest/"
+		window.location = restUrl;
 	}
 
 	function view(ssid) {
-		window.location = "../rest/" + ssid;
+		window.location = restUrl + ssid;
 	}
 
 	function register(ssid, description) {
 		var req = new XMLHttpRequest();
-		req.open("POST", "../rest/", false);   
+				
+		var rest = window.location.hostname 
+		req.open("POST", restUrl, false);   
 		var params = "ssid=" +ssid+ "&description=" + description;
 
 		req.send(params);
@@ -110,14 +124,14 @@
 
 	function unregister(ssid) {
 		var req = new XMLHttpRequest();
-		req.open("DELETE", "../rest/" + ssid, false);
+		req.open("DELETE", restUrl + ssid, false);
 		req.send("");
 		showResponse(req);
 	}
 
 	function addsource(ssid, srcid, description, latitude, longitude) {
 		var req = new XMLHttpRequest();
-		req.open("POST", "../rest/" +ssid + "/", false);   
+		req.open("POST", restUrl +ssid + "/", false);   
 		var params = "srcid=" +srcid+ "&description=" + description +
 			"&latitude=" +latitude +
 			"&longitude=" +longitude
@@ -128,7 +142,7 @@
 
 	function addstream(ssid, srcid, strid) {
 		var req = new XMLHttpRequest();
-		req.open("POST", "../rest/" +ssid + "/" +srcid+ "/", false);   
+		req.open("POST", restUrl +ssid + "/" +srcid+ "/", false);   
 		var params = "strid=" +strid ;
 		req.send(params);
 		showResponse(req);
@@ -137,7 +151,7 @@
 	function addvalue(ssid, srcid, strid) {
 		var value = "" + Math.random();
 		var req = new XMLHttpRequest();
-		req.open("PUT", "../rest/" +ssid + "/" +srcid+ "/" +strid, false);   
+		req.open("PUT", restUrl +ssid + "/" +srcid+ "/" +strid, false);   
 		var params = "value=" +value ;
 		req.send(params);
 		showResponse(req);
@@ -145,14 +159,14 @@
 
 	function removestream(ssid, srcid, strid) {
 		var req = new XMLHttpRequest();
-		req.open("DELETE", "../rest/" +ssid + "/" +srcid+ "/" + strid, false);   
+		req.open("DELETE", restUrl +ssid + "/" +srcid+ "/" + strid, false);   
 		req.send("");
 		showResponse(req);
 	}
 
 	function removesource(ssid, srcid) {
 		var req = new XMLHttpRequest();
-		req.open("DELETE", "../rest/" +ssid + "/" +srcid, false);   
+		req.open("DELETE", restUrl +ssid + "/" +srcid, false);   
 		req.send("");
 		showResponse(req);
 	}
