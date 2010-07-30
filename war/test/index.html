@@ -9,6 +9,17 @@
 	longitude = "-120";
 	strid = "bar";
 	winAttrs = 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=450,height=250';
+
+
+	dispatch = "";
+	
+	function getRest() {
+		var base = window.location.protocol + "//" + window.location.host + window.location.pathname;
+		dispatch = base.substring(0, base.length - "index.html".length) + "dispatch.html";
+		//alert("dispatch = " +dispatch);
+	}
+
+	
 </script>
 
 <table border="1" cellpadding="3" cellspacing="0">
@@ -22,7 +33,7 @@
 	<input
 	type="button" 
 	value="Register" 
-	onclick="javascript:window.open('dispatch.html?operation=register&ssid=' +ssid, '', winAttrs)" 
+	onclick="javascript:window.open(dispatch+ '?operation=register&ssid=' +ssid, '', winAttrs)" 
 	/>
 </td>
 
@@ -30,7 +41,7 @@
 	<input
 	type="button" 
 	value="Unregister" 
-	onclick="javascript:window.open('dispatch.html?operation=unregister&ssid=' +ssid, '', winAttrs)" 
+	onclick="javascript:window.open(dispatch+ '?operation=unregister&ssid=' +ssid, '', winAttrs)" 
 	/>
 </td>
 
@@ -38,7 +49,7 @@
 	<input 
 	type="button" 
 	value="View"
-	onclick="javascript:window.open('dispatch.html?operation=view&ssid=' +ssid, '', winAttrs)" 
+	onclick="javascript:window.open(dispatch+ '?operation=view&ssid=' +ssid, '', winAttrs)" 
 	/>
 </td>
 
@@ -54,7 +65,7 @@
 	<input 
 	type="button" 
 	value="Add" 
-	onclick="javascript:window.open('dispatch.html?operation=addsource&ssid=' +ssid+ 
+	onclick="javascript:window.open(dispatch+ '?operation=addsource&ssid=' +ssid+ 
 	'&srcid=' +srcid+ '&latitude=' +latitude+ '&longitude=' +longitude
 	, '', winAttrs)" 
 	/>
@@ -64,7 +75,7 @@
 	<input 
 	type="button" 
 	value="Remove" 
-	onclick="javascript:window.open('dispatch.html?operation=removesource&ssid=' +ssid+ 
+	onclick="javascript:window.open(dispatch+ '?operation=removesource&ssid=' +ssid+ 
 	'&srcid=' +srcid
 	, '', winAttrs)" 
 	/>
@@ -81,7 +92,7 @@
 	<input 
 	type="button" 
 	value="Add" 
-	onclick="javascript:window.open('dispatch.html?operation=addstream&ssid=' +ssid+ 
+	onclick="javascript:window.open(dispatch+ '?operation=addstream&ssid=' +ssid+ 
 	'&srcid=' +srcid+ '&strid=' +strid
 	, '', winAttrs)" 
 	/>
@@ -91,7 +102,7 @@
 	<input 
 	type="button" 
 	value="Remove" 
-	onclick="javascript:window.open('dispatch.html?operation=removestream&ssid=' +ssid+ 
+	onclick="javascript:window.open(dispatch+ '?operation=removestream&ssid=' +ssid+ 
 	'&srcid=' +srcid+ '&strid=' +strid
 	, '', winAttrs)" 
 	/>
@@ -101,7 +112,7 @@
 	<input 
 	type="button" 
 	value="Add value" 
-	onclick="javascript:window.open('dispatch.html?operation=addvalue&ssid=' +ssid+ 
+	onclick="javascript:window.open(dispatch+ '?operation=addvalue&ssid=' +ssid+ 
 	'&srcid=' +srcid+ '&strid=' +strid
 	, '', winAttrs)" 
 	/>
@@ -118,7 +129,7 @@
 	<input 
 	type="button" 
 	value="View all" 
-	onclick="javascript:window.open('dispatch.html?operation=viewall', '', winAttrs)" 
+	onclick="javascript:window.open(dispatch+ '?operation=viewall', '', winAttrs)" 
 	/>
 </td>
 
