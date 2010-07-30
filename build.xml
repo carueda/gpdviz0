@@ -1,78 +1,79 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <project name="gpdviz" default="war" basedir=".">
-	
-	<property file="build.properties" />	
-	
+
+	<property file="build.properties" />
+
 	<!-- Gpdviz endpoint for test programs -->
 	<property name="endpoint" value="http://localhost:8080/gpdviz/rest" />
-	
-  <!-- Arguments to gwtc and devmode targets -->
-  <property name="gwt.args" value="" />
 
-  <path id="project.class.path">
-    <pathelement location="war/WEB-INF/classes"/>
-    <pathelement location="${gwt.sdk}/gwt-user.jar"/>
-    <fileset dir="${gwt.sdk}" includes="gwt-dev*.jar"/>
-    <!-- Add any additional non-server libs (such as JUnit) -->
-    <fileset dir="war/WEB-INF/lib" includes="**/*.jar"/>
-  </path>
+	<!-- IEEE1451 server and NCAP -->
+	<property name="ieee1451server" value="http://147.83.140.20:1451/1451" />
+	<property name="ieee1451ncap" value="4" />
+
+	<!-- Arguments to gwtc and devmode targets -->
+	<property name="gwt.args" value="" />
+
+	<path id="project.class.path">
+		<pathelement location="war/WEB-INF/classes" />
+		<pathelement location="${gwt.sdk}/gwt-user.jar" />
+		<fileset dir="${gwt.sdk}" includes="gwt-dev*.jar" />
+		<!-- Add any additional non-server libs (such as JUnit) -->
+		<fileset dir="war/WEB-INF/lib" includes="**/*.jar" />
+	</path>
 
 	<target name="init">
-	    <mkdir dir="war/WEB-INF/lib" />
+		<mkdir dir="war/WEB-INF/lib" />
 		<mkdir dir="_generated" />
 		<tstamp>
-		    <format property="gpdviz.app.build" pattern="yyyyMMddHHmmss" />
+			<format property="gpdviz.app.build" pattern="yyyyMMddHHmmss" />
 		</tstamp>
 	</target>
-	
-  <target name="libs" depends="init" description="Copy libs to WEB-INF/lib">
-    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet.jar" />
-    <!-- Add any additional server libs that need to be copied -->
-  </target>
 
-  <target name="javac" depends="libs" description="Compile java source">
-    <mkdir dir="war/WEB-INF/classes"/>
-    <javac srcdir="src" includes="**" encoding="utf-8"
-        destdir="war/WEB-INF/classes"
-        source="1.5" target="1.5" nowarn="true"
-        debug="true" debuglevel="lines,vars,source">
-      <classpath refid="project.class.path"/>
-    </javac>
-    <copy todir="war/WEB-INF/classes">
-      <fileset dir="src" excludes="**/*.java"/>
-    </copy>
-  </target>
+	<target name="libs" depends="init" description="Copy libs to WEB-INF/lib">
+		<copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet.jar" />
+		<!-- Add any additional server libs that need to be copied -->
+	</target>
 
-  <target name="gwtc" depends="javac" description="GWT compile to JavaScript">
-    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
-      <classpath>
-        <pathelement location="src"/>
-        <path refid="project.class.path"/>
-      </classpath>
-      <!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
-      <jvmarg value="-Xmx256M"/>
-      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
-      <arg line="${gwt.args}"/>
-      <arg value="org.gpdviz.Gpdviz"/>
-    </java>
-  </target>
+	<target name="javac" depends="libs" description="Compile java source">
+		<mkdir dir="war/WEB-INF/classes" />
+		<javac srcdir="src" includes="**" encoding="utf-8" destdir="war/WEB-INF/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="project.class.path" />
+		</javac>
+		<copy todir="war/WEB-INF/classes">
+			<fileset dir="src" excludes="**/*.java" />
+		</copy>
+	</target>
 
-  <target name="devmode" depends="javac" description="Run development mode">
-    <java failonerror="true" fork="true" classname="com.google.gwt.dev.DevMode">
-      <classpath>
-        <pathelement location="src"/>
-        <path refid="project.class.path"/>
-      </classpath>
-      <jvmarg value="-Xmx256M"/>
-      <arg value="-startupUrl"/>
-      <arg value="gpdviz.html"/>
-      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
-      <arg line="${gwt.args}"/>
-      <arg value="org.gpdviz.Gpdviz"/>
-    </java>
-  </target>
+	<target name="gwtc" depends="javac" description="GWT compile to JavaScript">
+		<java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+			<classpath>
+				<pathelement location="src" />
+				<path refid="project.class.path" />
+			</classpath>
+			<!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
+			<jvmarg value="-Xmx256M" />
+			<!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+			<arg line="${gwt.args}" />
+			<arg value="org.gpdviz.Gpdviz" />
+		</java>
+	</target>
 
-<!--
+	<target name="devmode" depends="javac" description="Run development mode">
+		<java failonerror="true" fork="true" classname="com.google.gwt.dev.DevMode">
+			<classpath>
+				<pathelement location="src" />
+				<path refid="project.class.path" />
+			</classpath>
+			<jvmarg value="-Xmx256M" />
+			<arg value="-startupUrl" />
+			<arg value="gpdviz.html" />
+			<!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+			<arg line="${gwt.args}" />
+			<arg value="org.gpdviz.Gpdviz" />
+		</java>
+	</target>
+
+	<!--
 Test targets suppressed because -junit argument was not specified when running webAppCreator.
 
   <target name="javac.tests" depends="javac" description="Compiles test code">
@@ -134,103 +135,149 @@ Test targets suppressed because -junit argument was not specified when running w
   </target>
 -->
 
-  <target name="build" depends="gwtc" description="Build this project" />
+	<target name="build" depends="gwtc" description="Build this project" />
 
-  <target name="war" depends="build" description="Create a war file">
-    <zip destfile="_generated/gpdviz.war" basedir="war"/>
-  </target>
+	<target name="war" depends="build" description="Create a war file">
+		<zip destfile="_generated/gpdviz.war" basedir="war" />
+	</target>
 
-  <target name="clean" description="Cleans this project">
-    <delete dir="war/WEB-INF/classes" failonerror="false" />
-    <delete dir="war/gpdviz" failonerror="false" />
-    <delete dir="_generated" failonerror="false" />
-  </target>
+	<target name="clean" description="Cleans this project">
+		<delete dir="war/WEB-INF/classes" failonerror="false" />
+		<delete dir="war/gpdviz" failonerror="false" />
+		<delete dir="_generated" failonerror="false" />
+	</target>
 
-	
-	
-	
-	
+
+
+
+
 	<!-- client library -->
-	
-	  <target name="client-compile" depends="libs" description="Compile java source for client library">
-	    <mkdir dir="_generated/client/classes"/>
-	    <javac srcdir="src" encoding="utf-8"
-	        destdir="_generated/client/classes"
-	        source="1.5" target="1.5" nowarn="true"
-	        debug="true" debuglevel="lines,vars,source">
-	      <classpath refid="project.class.path"/>
-	      <include name="org/gpdviz/client/**"/>
-	      <include name="org/gpdviz/ss/**"/>
-	    </javac>
-	  </target>
-	
-	  <target name="client-jar" depends="client-compile" description="generates client library">
+
+	<target name="client-compile" depends="libs" description="Compile java source for client library">
+		<mkdir dir="_generated/client/classes" />
+		<javac srcdir="src" encoding="utf-8" destdir="_generated/client/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="project.class.path" />
+			<include name="org/gpdviz/client/**" />
+			<include name="org/gpdviz/ss/**" />
+		</javac>
+	</target>
+
+	<target name="client-jar" depends="client-compile" description="generates client library">
 		<jar destfile="_generated/gpdviz-client.jar">
-	  		<fileset dir="_generated/client/classes">
-	    		<include name="**/*.class"/>
-	    		<include name="**/*.properties"/>
-	  		</fileset>
+			<fileset dir="_generated/client/classes">
+				<include name="**/*.class" />
+				<include name="**/*.properties" />
+			</fileset>
 		</jar>
-	  </target>
+	</target>
 
 	<!-- simple client test -->
-	  <target name="simple-client" depends="client-jar">
-	    <java failonerror="true" fork="true" classname="org.gpdviz.client.GpdvizClientTest">
-	      <classpath>
-		      <pathelement location="war/WEB-INF/lib/org.restlet.jar"/>
-		      <pathelement location="_generated/gpdviz-client.jar"/>
-	      </classpath>
-	      <arg value="${endpoint}"/>
-	    </java>
-	  </target>
+	<target name="simple-client-compile" depends="client-jar" description="Compile java source for simple client demo">
+		<mkdir dir="_generated/simple-client/classes" />
+		<javac srcdir="src" encoding="utf-8" destdir="_generated/simple-client/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="project.class.path" />
+			<classpath location="_generated/gpdviz-client.jar" />
+			<include name="org/gpdviz/simpleclient/**" />
+		</javac>
+	</target>
+	<target name="simple-client" depends="client-jar, simple-client-compile">
+		<java failonerror="true" fork="true" classname="org.gpdviz.simpleclient.SimpleClient">
+			<classpath>
+				<pathelement location="war/WEB-INF/lib/org.restlet.jar" />
+				<pathelement location="_generated/gpdviz-client.jar" />
+				<pathelement location="_generated/simple-client/classes" />
+			</classpath>
+			<arg value="${endpoint}" />
+		</java>
+	</target>
 
-	
+
 	<!-- mock demo -->
-	
-	  <target name="mock-compile" depends="client-jar" description="Compile java source for mock demo jar">
-	    <mkdir dir="_generated/mock/classes"/>
-	    <javac srcdir="src" encoding="utf-8"
-	        destdir="_generated/mock/classes"
-	        source="1.5" target="1.5" nowarn="true"
-	        debug="true" debuglevel="lines,vars,source">
-	      <classpath refid="project.class.path"/>
-	      <classpath location="_generated/gpdviz-client.jar"/>
-	      <include name="org/gpdviz/mock/**"/>
-	    </javac>
-	  </target>
-	
-	  <target name="mock-generate" depends="mock-compile">
-	    <java failonerror="true" fork="true" classname="org.gpdviz.mock.Generate">
-	      <classpath>
-			  <path refid="project.class.path"/>
-		      <pathelement location="_generated/gpdviz-client.jar"/>
-	      	  <pathelement location="_generated/mock/classes"/>
-	      </classpath>
-	   	  <arg value="${endpoint}"/>
-	    </java>
-	  </target>
-	
-	  <target name="mock-reset" depends="mock-compile">
-	    <java failonerror="true" fork="true" classname="org.gpdviz.mock.Reset">
-	      <classpath>
-			  <path refid="project.class.path"/>
-		      <pathelement location="_generated/gpdviz-client.jar"/>
-		      <pathelement location="_generated/mock/classes"/>
-	      </classpath>
-	      <arg value="${endpoint}"/>
-	    </java>
-	  </target>
-	
-	  <target name="mock-unregister" depends="mock-compile">
-	    <java failonerror="true" fork="true" classname="org.gpdviz.mock.Unregister">
-	      <classpath>
-			  <path refid="project.class.path"/>
-		      <pathelement location="_generated/gpdviz-client.jar"/>
-		      <pathelement location="_generated/mock/classes"/>
-	      </classpath>
-	      <arg value="${endpoint}"/>
-	    </java>
-	  </target>
+
+	<target name="mock-compile" depends="client-jar" description="Compile java source for mock demo jar">
+		<mkdir dir="_generated/mock/classes" />
+		<javac srcdir="src" encoding="utf-8" destdir="_generated/mock/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="project.class.path" />
+			<classpath location="_generated/gpdviz-client.jar" />
+			<include name="org/gpdviz/mock/**" />
+		</javac>
+	</target>
+
+	<target name="mock-generate" depends="mock-compile">
+		<java failonerror="true" fork="true" classname="org.gpdviz.mock.Generate">
+			<classpath>
+				<path refid="project.class.path" />
+				<pathelement location="_generated/gpdviz-client.jar" />
+				<pathelement location="_generated/mock/classes" />
+			</classpath>
+			<arg value="${endpoint}" />
+		</java>
+	</target>
+
+	<target name="mock-reset" depends="mock-compile">
+		<java failonerror="true" fork="true" classname="org.gpdviz.mock.Reset">
+			<classpath>
+				<path refid="project.class.path" />
+				<pathelement location="_generated/gpdviz-client.jar" />
+				<pathelement location="_generated/mock/classes" />
+			</classpath>
+			<arg value="${endpoint}" />
+		</java>
+	</target>
+
+	<target name="mock-unregister" depends="mock-compile">
+		<java failonerror="true" fork="true" classname="org.gpdviz.mock.Unregister">
+			<classpath>
+				<path refid="project.class.path" />
+				<pathelement location="_generated/gpdviz-client.jar" />
+				<pathelement location="_generated/mock/classes" />
+			</classpath>
+			<arg value="${endpoint}" />
+		</java>
+	</target>
+
+	<!-- IEEE1451 test -->
+	<target name="ieee1451-compile" depends="client-jar" description="Compile java source for IEEE1451 demo jar">
+		<mkdir dir="_generated/ieee1451/classes" />
+		<javac srcdir="src" encoding="utf-8" destdir="_generated/ieee1451/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="project.class.path" />
+			<classpath location="_generated/gpdviz-client.jar" />
+			<include name="org/gpdviz/ieee1451/**" />
+		</javac>
+	</target>
+
+	<target name="ieee1451" depends="client-jar, ieee1451-compile">
+		<java failonerror="true" fork="true" classname="org.gpdviz.ieee1451.Ieee1451Main">
+			<classpath>
+				<pathelement location="war/WEB-INF/lib/org.restlet.jar" />
+				<pathelement location="_generated/gpdviz-client.jar" />
+				<pathelement location="_generated/ieee1451/classes" />
+			</classpath>
+			<arg value="--endpoint" />
+			<arg value="${endpoint}" />
+			<arg value="--server" />
+			<arg value="${ieee1451server}" />
+			<arg value="--ncap" />
+			<arg value="${ieee1451ncap}" />
+		</java>
+	</target>
+
+	<target name="ieee1451-unregister" depends="client-jar, ieee1451-compile">
+		<java failonerror="true" fork="true" classname="org.gpdviz.ieee1451.Ieee1451main">
+			<classpath>
+				<pathelement location="war/WEB-INF/lib/org.restlet.jar" />
+				<pathelement location="_generated/gpdviz-client.jar" />
+				<pathelement location="_generated/ieee1451/classes" />
+			</classpath>
+			<arg value="--endpoint" />
+			<arg value="${endpoint}" />
+			<arg value="--server" />
+			<arg value="${ieee1451server}" />
+			<arg value="--ncap" />
+			<arg value="${ieee1451ncap}" />
+			<arg value="--unregister" />
+		</java>
+	</target>
 
 
 </project>

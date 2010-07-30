@@ -1,6 +1,7 @@
 package org.gpdviz.client;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 
 import org.restlet.data.Form;
@@ -25,6 +26,22 @@ public class GpdvizClient {
 		this.endpoint = endpoint;
 		this.sensorSystemsResource = new ClientResource(endpoint + "/");
 	}
+
+	
+	/**
+	 * Sets an ad hoc logger to report the requests and the status of the
+	 * responses.
+	 * 
+	 * @param logger Where the messages are printed out.
+	 * @param prefix A string to print as a prefix of every logged message.
+	 */
+	public void setLogger(Writer logger, String prefix) {
+		loggerPrefix = prefix == null ? "" : prefix;
+		this.logger = (logger instanceof PrintWriter)
+			? (PrintWriter) logger 
+			: new PrintWriter(logger);
+	}
+
 
 	/**
 	 * Prints a basic description of the registered sensor systems
@@ -197,6 +214,8 @@ public class GpdvizClient {
 	// private
 	////////////////////////////////////////////////////////////////////////////////////
 	
+	private String loggerPrefix;
+	private PrintWriter logger;
 	private final String endpoint;
 	private final ClientResource sensorSystemsResource;
 	
@@ -226,63 +245,118 @@ public class GpdvizClient {
 	}
 	
 	private Status _get(ClientResource clientResource, Writer writer) throws IOException {
+		final String oper = "GET";
+		if ( logger != null ) {
+			_logRequest(oper, clientResource, null);
+		}
+
+		Status status = Status.SUCCESS_OK;
 		
 		try {
 			clientResource.get();
-		}
-		catch (ResourceException e) {
-			Status status = e.getStatus();
-			return status;
-		}
-		
-		if ( writer != null ) {
-			if (clientResource.getStatus().isSuccess()
-			&& clientResource.getResponseEntity().isAvailable()) 
-			{
-				clientResource.getResponseEntity().write(writer);
+			
+			if ( writer != null ) {
+				if (clientResource.getStatus().isSuccess()
+				&& clientResource.getResponseEntity().isAvailable()) 
+				{
+					clientResource.getResponseEntity().write(writer);
+				}
 			}
 		}
+		catch (ResourceException e) {
+			status = e.getStatus();
+		}
 		
-		return Status.SUCCESS_OK;
+		if ( logger != null ) {
+			_logStatus(oper, status);
+		}
+		
+		return status;
 	}
 
 	private Status _post(ClientResource clientResource, Representation rep) {
-		
+		final String oper = "POST";
+		if ( logger != null ) {
+			_logRequest(oper, clientResource, rep);
+		}
+
+		Status status = Status.SUCCESS_OK;
+				
 		try {
 			clientResource.post(rep);
 		}
 		catch (ResourceException e) {
-			Status status = e.getStatus();
-			return status;
+			status = e.getStatus();
 		}
 		
-		return Status.SUCCESS_OK;
+		if ( logger != null ) {
+			_logStatus(oper, status);
+		}
+
+		return status;
 	}
 
 	private Status _put(ClientResource clientResource, Representation rep) {
+		final String oper = "PUT";
+		if ( logger != null ) {
+			_logRequest(oper, clientResource, rep);
+		}
+
+		Status status = Status.SUCCESS_OK;
 		
 		try {
 			clientResource.put(rep);
 		}
 		catch (ResourceException e) {
-			Status status = e.getStatus();
-			return status;
+			status = e.getStatus();
 		}
 		
-		return Status.SUCCESS_OK;
+		if ( logger != null ) {
+			_logStatus(oper, status);
+		}
+
+		return status;
 	}
 
 	private Status _delete(ClientResource clientResource) {
-		
+		final String oper = "DELETE";
+		if ( logger != null ) {
+			_logRequest(oper, clientResource, null);
+		}
+
+		Status status = Status.SUCCESS_OK;
+				
 		try {
 			clientResource.delete();
 		}
 		catch (ResourceException e) {
-			Status status = e.getStatus();
-			return status;
+			status = e.getStatus();
 		}
 		
-		return Status.SUCCESS_OK;
+		if ( logger != null ) {
+			_logStatus(oper, status);
+		}
+
+		return status;
 	}
-	
+
+	private void _logRequest(String operation, ClientResource clientResource, Representation rep) {
+		String uri = clientResource.getReference().getIdentifier();
+		String repStr = "";
+		if ( rep != null ) {
+			try {
+				repStr = "  {" +rep.getText()+ "}";
+			}
+			catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		logger.printf("%s %s.%s: %s%s%n",
+				loggerPrefix, getClass().getSimpleName(), operation, uri, repStr);
+	}
+	private void _logStatus(String operation, Status status) {
+		logger.printf("%s %s.%s: status = %s%n%n",
+				loggerPrefix, getClass().getSimpleName(), operation, status);
+	}
 }

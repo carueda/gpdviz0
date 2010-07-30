@@ -1,20 +1,21 @@
-package org.gpdviz.client;
+package org.gpdviz.simpleclient;
 
 import java.io.StringWriter;
 
+import org.gpdviz.client.GpdvizClient;
 import org.restlet.data.Status;
 
 /** 
  * A test client for the REST interface.
  * @author Carlos Rueda
  */
-public class GpdvizClientTest {
+public class SimpleClient {
 
 	private static final String DEFAULT_ENDPOINT = "http://127.0.0.1:8888/rest";
 
 	
 	public static void main(String[] args) throws Exception {
-		new GpdvizClientTest(args);
+		new SimpleClient(args);
 	}
 
 
@@ -32,7 +33,7 @@ public class GpdvizClientTest {
 	private double X_INC = Math.PI / 5;
 
 
-	GpdvizClientTest(String[] args) throws Exception {
+	SimpleClient(String[] args) throws Exception {
 		String endPoint = DEFAULT_ENDPOINT;
 		if ( args.length > 0 ) {
 			if ( args[0].matches("-*help.*") ) {

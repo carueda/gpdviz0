@@ -6,6 +6,26 @@ ChangeLog
 2010-07-29
 	- war/test/ - quick html based way to test REST operations. Once deployed, open
 	  http://localhost:8080/gpdviz/test/index.html
+	  
+	- added GpdvizClient.setLogger
+	
+	IEEE 1451 client demo:
+	- added first version to pull data from an IEEE1451 server and push it to a Gpdviz endpoint.
+	- org.gpdviz.ieee1451.client.Ieee1451Client provides a high-level API to get info
+	  from a IEEE1451 server.
+	- The main program Ieee1451Main registers and sets up the sensor system, ie., TIMs,
+	  channels for each TIM, and values (one value per channel).
+	  
+	TODO one possible next step is to launch a timer for each channel to continue requesting
+	and notifying new values to the Gpdviz endpoint.
+	
+	TODO Bug found: A second client session (ant ieee1451) does not get properly
+	reflected in the visualizer even if the previous session completes normally (with the
+	final unregistration).
+	A similar situation happens wih (ant simple-client) but only if the first session is
+	terminates without the final unregistration.
+	
+	
 	
 2010-07-28
 	- did quick investigation to see the feasibility of deploying Gpdviz on the
