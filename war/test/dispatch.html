@@ -28,20 +28,11 @@
 			return results[1];
 	}
 
-	restUrl = "http://mmisw.org/gpdviz/rest/";
+	restUrl = "../rest/";
 	
-	// gets the URL of the REST endpoint. This assumes this page is
-	// located at "XXXX/test/dispatch.html" and that the rest endpoint is
-	// at "XXXX/rest".
-	function getRest() {
-		//var base = window.location.protocol + "//" + window.location.host + window.location.pathname;
-		// restUrl = base.substring(0, base.length - "test/dispatch.html".length) + "rest/";
-		//alert("restUrl = " +restUrl);
-	}
 
 	function dispatch() {     
 		var operation = gup('operation');  
-		getRest();
 
 		if (operation == "register") {
 			var ssid = gup('ssid'); 
