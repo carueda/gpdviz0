@@ -4,7 +4,8 @@ Carlos Rueda - MBARI
 ChangeLog
 
 2010-07-29
-	- war/test/ - quick html based way to test REST operations.
+	- war/test/ - quick html based way to test REST operations. Once deployed, open
+	  http://localhost:8080/gpdviz/test/index.html
 	
 2010-07-28
 	- did quick investigation to see the feasibility of deploying Gpdviz on the
