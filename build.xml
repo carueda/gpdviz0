@@ -263,7 +263,7 @@ Test targets suppressed because -junit argument was not specified when running w
 	</target>
 
 	<target name="ieee1451-unregister" depends="client-jar, ieee1451-compile">
-		<java failonerror="true" fork="true" classname="org.gpdviz.ieee1451.Ieee1451main">
+		<java failonerror="true" fork="true" classname="org.gpdviz.ieee1451.Ieee1451Main">
 			<classpath>
 				<pathelement location="war/WEB-INF/lib/org.restlet.jar" />
 				<pathelement location="_generated/gpdviz-client.jar" />
