@@ -3,6 +3,14 @@ Carlos Rueda - MBARI
 
 ChangeLog
 
+2010-07-31
+	- Bug below fixed:
+	  - LocationsPanel.clear() was not clearing _elements map.
+	  - GMap.clear() was not clearing _markers map.
+	- VizPanel:
+	  - refreshState: less deferredCommands for more immediate refresh. 
+	  - removed need for gpdvizService to better separate concerns.
+	
 2010-07-29
 	- war/test/ - quick html based way to test REST operations. Once deployed, open
 	  http://localhost:8080/gpdviz/test/index.html

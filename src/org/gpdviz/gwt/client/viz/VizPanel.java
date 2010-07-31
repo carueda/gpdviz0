@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.gpdviz.gwt.client.Gpdviz;
 import org.gpdviz.gwt.client.map.GMap;
-import org.gpdviz.gwt.client.service.GpdvizServiceAsync;
 import org.gpdviz.gwt.client.util.MessagesPopup;
 import org.gpdviz.ss.SensorSystemInfo;
 import org.gpdviz.ss.Source;
@@ -13,7 +12,6 @@ import org.gpdviz.ss.Stream;
 
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -21,17 +19,20 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * The main viz panel.
+ * Handles the main visualization panel.
+ * 
  * @author Carlos Rueda
  */
-public class VizPanel extends VerticalPanel {
- 
-	private final GpdvizServiceAsync gpdvizService;
-	private final String ssid;
-	private Label descriptionLabel = new Label("");
-	private HTML statusLabel = new HTML("event");
+public class VizPanel {
 	
-	private HorizontalPanel gmapPanel = new HorizontalPanel();
+	/** The actual widget */
+	private final VerticalPanel myPanel = new VerticalPanel();
+ 
+	private final String ssid;
+	private final Label descriptionLabel = new Label("");
+	private final HTML statusLabel = new HTML("event");
+	
+	private final HorizontalPanel gmapPanel = new HorizontalPanel();
 	private GMap gmap;
     
 	// used when no gmap:
@@ -39,15 +40,16 @@ public class VizPanel extends VerticalPanel {
 	
 	private final MessagesPopup messages = new MessagesPopup();
 
+	
+	private boolean handlersSet;
 
     /**
      * Creates the main panel.
      * @param metadata
      * @param params
      */
-	public VizPanel(GpdvizServiceAsync gpdvizService, String ssid, boolean useGmap) {
+	public VizPanel(String ssid, boolean useGmap) {
 		
-		this.gpdvizService = gpdvizService;
 		this.ssid = ssid;
 		
 //		setBorderWidth(1);
@@ -59,10 +61,10 @@ public class VizPanel extends VerticalPanel {
 		
 		statusPanel.add(descriptionLabel);
 		statusPanel.add(statusLabel);
-		add(statusPanel);
+		myPanel.add(statusPanel);
 		
-    	add(gmapPanel);
-    	add(locsPanel.getWidget());
+		myPanel.add(gmapPanel);
+		myPanel.add(locsPanel.getWidget());
     	
 		// map:
     	if ( useGmap ) {
@@ -75,6 +77,10 @@ public class VizPanel extends VerticalPanel {
     			gmapPanel.add(new Label("Error while creating GMap: " +thr.getMessage()));
     		}
     	}
+	}
+	
+	public Widget getWidget() {
+		return myPanel;
 	}
 	
 	public void reset() {
@@ -242,26 +248,6 @@ public class VizPanel extends VerticalPanel {
 	}
 	
 	
-	/** performs the init sequence */
-	public void init() {
-		gpdvizService.connect(ssid, new AsyncCallback<SensorSystemInfo>() {
-
-			public void onFailure(Throwable caught) {
-				setStatus("<font color=\"red\">" +"ERROR" +":</font> " +caught.getClass().getName()+ ": " +caught.getMessage());
-			}
-
-			public void onSuccess(SensorSystemInfo ssi) {
-				refreshState(ssi);
-				
-				// and prepare to receive events:
-				// Note, this is done even if no such sensor system is currently registered
-				EventCommandHandlers.setHandlers(ssid, VizPanel.this, messages);
-			}
-		});
-		
-	}
-
-
 	private void refreshState(final SensorSystemInfo ssi) {
 		
 		Gpdviz.log(this.getClass().getName()+ ": refreshState: " +ssid+ ": " +ssi);
@@ -278,24 +264,24 @@ public class VizPanel extends VerticalPanel {
 		// initialize interface with obtained sensor system info:
 		
 		// add sources:
-		for ( String srcfid : ssi.getSourceFullIds() ) { 
-			final Source src = ssi.getSource(srcfid);
-			DeferredCommand.addCommand(new Command() {
-				public void execute() {
+		DeferredCommand.addCommand(new Command() {
+			public void execute() {
+				for ( String srcfid : ssi.getSourceFullIds() ) { 
+					Source src = ssi.getSource(srcfid);
 					addSource(src);
 				}
-			});
-		}
+			}
+		});
 		
 		// for each, source, add its streams, 
 		// each with its last known value, if any:
-		for ( String srcfid : ssi.getSourceFullIds() ) { 
-			List<Stream> strs = ssi.getStreams(srcfid );
-			for ( final Stream str : strs ) {
-				DeferredCommand.addCommand(new Command() {
-					public void execute() {
+		DeferredCommand.addCommand(new Command() {
+			public void execute() {
+				for ( String srcfid : ssi.getSourceFullIds() ) { 
+					List<Stream> strs = ssi.getStreams(srcfid);
+					for ( final Stream str : strs ) {
 						addStream(str);
-						
+
 						String strfid = str.getFullName();
 						List<String> values = ssi.getLastValue(strfid);
 						if ( values != null ) {
@@ -304,9 +290,9 @@ public class VizPanel extends VerticalPanel {
 							}
 						}
 					}
-				});
+				}
 			}
-		}
+		});
 	}
 
 	public String getSsid() {
@@ -314,7 +300,14 @@ public class VizPanel extends VerticalPanel {
 	}
 
 	public void setSensorSystemInfo(SensorSystemInfo ssi) {
-		refreshState(ssi);		
+		refreshState(ssi);	
+		
+		if ( ! handlersSet ) {
+			// and prepare to receive events:
+			// Note, this is done even if no such sensor system is currently registered
+			EventCommandHandlers.setHandlers(ssid, VizPanel.this, messages);
+			handlersSet = true;
+		}
 	}
 
 }

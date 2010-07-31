@@ -11,10 +11,12 @@ import org.gpdviz.gwt.client.service.GpdvizService;
 import org.gpdviz.gwt.client.service.GpdvizServiceAsync;
 import org.gpdviz.gwt.client.util.GizUtil;
 import org.gpdviz.gwt.client.viz.VizPanel;
+import org.gpdviz.ss.SensorSystemInfo;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -95,9 +97,9 @@ public class Gpdviz implements EntryPoint {
 		// Else: regular visualizer
 		if ( ssid != null ) {
 			gpdvizService = GWT.create(GpdvizService.class);
-			VizPanel vizPanel = new VizPanel(gpdvizService, ssid, useGmap);
-			RootPanel.get("mainPanelContainer").add(vizPanel);
-			vizPanel.init();
+			VizPanel vizPanel = new VizPanel(ssid, useGmap);
+			RootPanel.get("mainPanelContainer").add(vizPanel.getWidget());
+			_connect(vizPanel);
 		}
 		else {
 			RootPanel.get("mainPanelContainer").add(
@@ -106,4 +108,24 @@ public class Gpdviz implements EntryPoint {
 		}
 		
 	}
+	
+	/** 
+	 * connects to obtain the sensor system information. 
+	 */
+	private void _connect(final VizPanel vizPanel) {
+		gpdvizService.connect(ssid, new AsyncCallback<SensorSystemInfo>() {
+
+			public void onFailure(Throwable caught) {
+				RootPanel.get("mainPanelContainer").add(
+						new HTML("<font color=\"red\">" +"ERROR" +":</font> " +caught.getClass().getName()+ ": " +caught.getMessage())
+				);
+			}
+
+			public void onSuccess(SensorSystemInfo ssi) {
+				vizPanel.setSensorSystemInfo(ssi);
+			}
+		});
+		
+	}
+
 }

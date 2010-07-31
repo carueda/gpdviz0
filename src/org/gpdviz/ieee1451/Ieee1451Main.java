@@ -71,6 +71,7 @@ public class Ieee1451Main {
 		String ieee1451server = null;
 		String ieee1451ncap = null;
 		boolean unregister = false;
+		boolean assumeRegistered = false;
 		
 		if ( args.length == 0 || args[0].matches("-*help.*") ) {
 			_usage(null);
@@ -88,6 +89,9 @@ public class Ieee1451Main {
 			}
 			else if ( args[arg].equals("--unregister") ) {
 				unregister = true;
+			}
+			else if ( args[arg].equals("--assumeRegistered") ) {
+				assumeRegistered = true;
 			}
 		}
 		
@@ -121,7 +125,9 @@ public class Ieee1451Main {
 			return;
 		}
 
-		_prepareSensorSystem(ssid, ssDescription);
+		if ( ! assumeRegistered ) {
+			_prepareSensorSystem(ssid, ssDescription);
+		}
 
 		for ( final String timId : tims ) {
 			_log(" tim = " +timId);

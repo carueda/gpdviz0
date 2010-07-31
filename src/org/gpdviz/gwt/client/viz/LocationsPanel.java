@@ -16,14 +16,14 @@ import com.google.gwt.user.client.ui.Widget;
 public class LocationsPanel {
 
 	Widget getWidget() {
-    	return panel;
+    	return _panel;
     }
 
 	void addLoc(String lat, String lon, Widget widget) {
 		CellPanel elem = _getElement(lat, lon);
 		if ( elem == null ) {
 			elem = _createElement(lat, lon, widget);
-			panel.add(elem);
+			_panel.add(elem);
 		}
 		else {
 			elem.clear();
@@ -36,12 +36,13 @@ public class LocationsPanel {
 	void removeLoc(String lat, String lon) {
 		CellPanel elem = _removeElement(lat, lon);
 		if ( elem != null ) {
-			panel.remove(elem);
+			_panel.remove(elem);
 		}
 	}
 
 	void clear() {
-		panel.clear();
+		_panel.clear();
+		_elements.clear();
 	}
 
 	
@@ -49,26 +50,26 @@ public class LocationsPanel {
 	// private
 	//////////////////////////////////////////////////////////////////////
 	
-	private HorizontalPanel panel = new HorizontalPanel();
-	private Map<String,CellPanel> elements = new HashMap<String,CellPanel>();
+	private HorizontalPanel _panel = new HorizontalPanel();
+	private Map<String,CellPanel> _elements = new HashMap<String,CellPanel>();
 	
 	
 	private CellPanel _createElement(String lat, String lon, Widget widget) {
 		String key = lat+ "," +lon;
 		CellPanel elem = new VerticalPanel();
-		elements.put(key, elem);
+		_elements.put(key, elem);
 		return elem;
 	}
 	
 	private CellPanel _getElement(String slat, String slon) {
 		String key = slat+ "," +slon;
-		CellPanel elem = elements.get(key);
+		CellPanel elem = _elements.get(key);
 		return elem;
 	}
 	
 	private CellPanel _removeElement(String slat, String slon) {
 		String key = slat+ "," +slon;
-		CellPanel elem = elements.remove(key);
+		CellPanel elem = _elements.remove(key);
 		return elem;
 	}
 }
