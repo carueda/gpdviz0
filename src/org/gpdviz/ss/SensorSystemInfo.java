@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Upon an initial notification of the state of a sensor system,
- * the client will continue to update its own state according to received events.
- * But, the client would be able to request a full state again if necessary.
+ * Information associated to a sensor system.
+ * 
  * @author Carlos Rueda
  */
 @SuppressWarnings("serial")
@@ -64,7 +63,7 @@ public class SensorSystemInfo implements Serializable {
 	public void reset() {
 		_srcs.clear();
 		_strs.clear();
-		_lastValues.clear();
+		_latestObs.clear();
 	}
 	
 	public Map<String, Source> getSources() {
@@ -121,13 +120,13 @@ public class SensorSystemInfo implements Serializable {
 	 * @param strfid
 	 * @param value
 	 */
-	public void addValue(String strfid, String value) {
-		List<String> values = _lastValues.get(strfid);
+	public void addValue(String strfid, Observation obs) {
+		List<Observation> values = _latestObs.get(strfid);
 		if ( values == null ) {
-			values = new ArrayList<String>();
-			_lastValues.put(strfid, values);
+			values = new ArrayList<Observation>();
+			_latestObs.put(strfid, values);
 		}
-		_addValue(values, value);
+		_addValue(values, obs);
 	}
 
 
@@ -135,8 +134,8 @@ public class SensorSystemInfo implements Serializable {
 	 * @param strfid
 	 * @return
 	 */
-	public List<String> getLastValue(String strfid) {
-		return _lastValues.get(strfid);
+	public List<Observation> getObservations(String strfid) {
+		return _latestObs.get(strfid);
 	}
 	
 	public String toString() {
@@ -149,18 +148,18 @@ public class SensorSystemInfo implements Serializable {
 	// private
 	//////////////////////////////////////////
 
-	private static final int MAX_NO_VALUES = 30;
+	private static final int MAX_NO_OBSERVATIONS = 30;
 
 
 	/**
-	 * Adds a value to the list making sure that the size of the list is at most
-	 * {@link #MAX_NO_VALUES} elements.
+	 * Adds an Observation to the list making sure that the size of the list is at most
+	 * {@link #MAX_NO_OBSERVATIONS} elements.
 	 */
-	private void _addValue(List<String> values, String value) {
-		while ( values.size() >= MAX_NO_VALUES ) {
+	private void _addValue(List<Observation> values, Observation obs) {
+		while ( values.size() >= MAX_NO_OBSERVATIONS ) {
 			values.remove(0);
 		}
-		values.add(value);
+		values.add(obs);
 	}
 
 	
@@ -181,10 +180,10 @@ public class SensorSystemInfo implements Serializable {
 
     /**
      * Preliminary.
-     * The last known values per stream.
-     * strfid -> String(last value)
+     * The latest known observations per stream.
+     * strfid -> List&lt;Observation>
      */
-    private Map<String,List<String>> _lastValues = new HashMap<String,List<String>>();
+    private Map<String,List<Observation>> _latestObs = new HashMap<String,List<Observation>>();
     
 
 }

@@ -1,8 +1,13 @@
 package org.gpdviz.simpleclient;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.gpdviz.client.GpdvizClient;
+import org.gpdviz.ss.Observation;
 import org.restlet.data.Status;
 
 /** 
@@ -47,12 +52,13 @@ public class SimpleClient {
 		}
 
 		gpdvizClient = new GpdvizClient(endPoint);
+		gpdvizClient.setLogger(new PrintWriter(System.out, true), "%%%%% ");
 		
 		_pause();
 		
 		_prepareSensorSystem();   _pause();
 		_addSource();             _pause();
-		_addStream();             _pause();
+		_addStream("my title");   _pause();
 
 		// values
 		while ( x < 2 * Math.PI  &&  _addValue() ) {
@@ -97,7 +103,7 @@ public class SimpleClient {
 	}
 
 	private void _addSource() throws Exception {
-		Status status = gpdvizClient.addNewSource(SS_ID, SRC_ID, SRC_DESCRIPTION, "32", "-120" );
+		Status status = gpdvizClient.addSource(SS_ID, SRC_ID, SRC_DESCRIPTION, "32", "-120" );
 		_log("addNewSource"+ ": " +SS_ID+ "/" + SRC_ID+ ": " +status);
 	}
 	
@@ -106,8 +112,10 @@ public class SimpleClient {
 		_log("removeSource"+ ": " +SS_ID+ "/" + SRC_ID+ ": " +status);
 	}
 	
-	private void _addStream() throws Exception {
-		Status status = gpdvizClient.addNewStream(SS_ID, SRC_ID, STR_ID);
+	private void _addStream(String title) throws Exception {
+		Map<String,String> props = new HashMap<String,String>();
+		props.put("title", title);
+		Status status = gpdvizClient.addStream(SS_ID, SRC_ID, STR_ID, props);
 		_log("addNewStream"+ ": " +SS_ID+ "/" + SRC_ID+  "/" + STR_ID+ ": " +status);
 	}
 	
@@ -118,12 +126,12 @@ public class SimpleClient {
 	
 	private boolean _addValue() throws Exception {
 		double val = Math.sin(x);
-		String value = String.valueOf(val);
+		Observation obs = new Observation(new Date().getTime(), String.valueOf(val));
 		
 		String strfid = SRC_ID+ "/" +STR_ID;
-		Status status = gpdvizClient.addNewValue(SS_ID, STR_ID, strfid , value);
+		Status status = gpdvizClient.addObservation(SS_ID, STR_ID, strfid , obs);
 		
-		_log("x=" +x+ " VALUE" + ": " +value+ " : " +status);
+		_log("x=" +x+ " VALUE at " +obs.getTimestamp()+ " : " +obs.getValue()+ " : " +status);
 		x += X_INC;
 		
 		return status.equals(Status.SUCCESS_OK);

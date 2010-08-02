@@ -8,14 +8,19 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gpdviz.ss.Observation;
+
 
 /**
- * Provides content information from an IEEE1451 server.
+ * Provides data from an IEEE1451 server.
+ * <p>
+ * Note: implementation only intended for demonstration purposes.
+ * 
  * @author Carlos Rueda
  */
 public class Ieee1451Client {
 	
-	/** tmeout for connect and read: 20 secs */
+	/** timeout for connect and read: 20 secs */
 	private static final int CONNECT_AND_READ_TIMEOUT = 20 * 1000;
 
 	
@@ -40,36 +45,10 @@ public class Ieee1451Client {
 		return ncapId+ ":" +server;
 	}
 
-	
-	
-	public static class DataPoint {
-		public DataPoint(long millis, String value) {
-			this.setMillis(millis);
-			this.setValue(value);
-		}
-		
-		private void setValue(String value) {
-			this.value = value;
-		}
-		
-		public String getValue() {
-			return value;
-		}
-		private void setMillis(long millis) {
-			this.millis = millis;
-		}
-
-		public long getMillis() {
-			return millis;
-		}
-		private long millis;
-		private String value;
-	}
-
-	public DataPoint getDataPoint(String timId, String channelId) throws IOException, Exception {
+	public Observation getObservation(String timId, String channelId) throws IOException, Exception {
 		String getDataUrl = getDataUrl(timId, channelId); 
 		
-        String response = getResponse("getDataPoint", getDataUrl);
+        String response = getResponse("getObservation", getDataUrl);
         String[] toks = parseResponse(response); 
 
         long seconds;
@@ -90,10 +69,10 @@ public class Ieee1451Client {
 			throw new Exception("Cannot parse the data response: " +response, ex);
 		}
         
-        long millis = seconds*1000 + nanosec/1000000;
+        long timestamp = seconds*1000 + nanosec/1000000;
         
-        DataPoint dataPoint = new DataPoint(millis, svalue);
-        return dataPoint;
+        Observation obs = new Observation(timestamp, svalue);
+        return obs;
 	}
 	
 	private String getDataUrl(String timId, String channelId) {
@@ -132,6 +111,10 @@ public class Ieee1451Client {
 	public static class TransducerInfo {
 		private String channelId;
 		String name;
+		
+		TransducerInfo() {
+		}
+		
 		private void setChannelId(String channelId) {
 			this.channelId = channelId;
 		}
@@ -206,7 +189,7 @@ public class Ieee1451Client {
         return url;
     }
     
-	String getChannelDescription(String timId, String channelId) throws IOException {
+	public String getChannelDescription(String timId, String channelId) throws IOException {
 //		if ( true ) return "CH-" +timId+ "-" + channelId;
     	String channelIdUrl = getChannelIdUrl(""+ timId, ""+ channelId);
     	String[] toks = getAndParseResponse("getChannelDescription", channelIdUrl);

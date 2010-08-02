@@ -6,6 +6,7 @@ import java.util.List;
 import org.gpdviz.gwt.client.Gpdviz;
 import org.gpdviz.gwt.client.map.GMap;
 import org.gpdviz.gwt.client.util.MessagesPopup;
+import org.gpdviz.ss.Observation;
 import org.gpdviz.ss.SensorSystemInfo;
 import org.gpdviz.ss.Source;
 import org.gpdviz.ss.Stream;
@@ -240,9 +241,10 @@ public class VizPanel {
 		
 	}
 	
-	public void addNewValue(String strfid, String value) {
+	/** TODO Use timestamp */
+	public void addNewValue(String strfid, long timestamp, String value) {
 		StreamPanel strPanel = Panels.getStreamPanel(strfid);
-//		Stream str = strPanel.getStr();
+		
 		strPanel.addPoint(Double.parseDouble(value));
 		strPanel.update();
 	}
@@ -283,10 +285,10 @@ public class VizPanel {
 						addStream(str);
 
 						String strfid = str.getFullName();
-						List<String> values = ssi.getLastValue(strfid);
-						if ( values != null ) {
-							for ( String value : values ) {
-								addNewValue(strfid, value);
+						List<Observation> observs = ssi.getObservations(strfid);
+						if ( observs != null ) {
+							for ( Observation obs : observs ) {
+								addNewValue(strfid, obs.getTimestamp(), obs.getValue());
 							}
 						}
 					}

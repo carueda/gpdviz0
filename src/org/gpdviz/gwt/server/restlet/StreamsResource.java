@@ -51,6 +51,9 @@ public class StreamsResource extends BaseResource {
 		// "name=value" tokens.
 		Form form = new Form(entity);
 		String strid = form.getFirstValue("strid");
+		
+		String period = form.getFirstValue("period");
+		String units = form.getFirstValue("units");
 
 		SensorSystem ss = (SensorSystem) gpdvizManager.getSensorSystem(ssid);
 		Source src = ss.getSensorSystemInfo().getSource(srcid);
@@ -65,7 +68,10 @@ public class StreamsResource extends BaseResource {
 		// TODO synchronize to prevent concurrent update
 		if (str == null) {
 			
-			str = new Stream(strid, strfid, 1000, "UNITS");
+			str = new Stream(strid, strfid, period, units);
+			_setAttributeIfGiven(str, form, "title");
+			_setAttributeIfGiven(str, form, "legend");
+			_setAttributeIfGiven(str, form, "xlabel");
 
 			ss.addStream(src, str);
 			setStatus(Status.SUCCESS_CREATED);
@@ -89,6 +95,13 @@ public class StreamsResource extends BaseResource {
 
 
 	 
+	private void _setAttributeIfGiven(Stream str, Form form, String name) {
+		String value = form.getFirstValue(name);
+		if ( value != null ) {
+			str.setStringAttribute(name, value);
+		}
+	}
+
 	/**
 	 * Returns a listing of all registered streams for the source. 
 	 * @return

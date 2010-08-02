@@ -7,7 +7,7 @@ import org.gpdviz.ss.event.IvEvent;
 import org.gpdviz.ss.event.IvEventListener;
 import org.gpdviz.ss.event.SourceAddedEvent;
 import org.gpdviz.ss.event.StreamAddedEvent;
-import org.gpdviz.ss.event.ValueAddedEvent;
+import org.gpdviz.ss.event.ObservationAddedEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 import org.gpdviz.ss.event.SourceRemovedEvent;
 import org.gpdviz.ss.event.StreamRemovedEvent;
@@ -77,11 +77,11 @@ public class SensorSystem {
 		notifyEvent(event);
 	}
 	
-	public void addValue(Source src, Stream str, String value) {
+	public void addObservation(Source src, Stream str, Observation obs) {
 		String strid = str.getName();
 		String strfid = str.getFullName();
-		sensorSystemInfo.addValue(strfid, value);
-		IvEvent event = new ValueAddedEvent(ssid, strid, strfid, value);
+		sensorSystemInfo.addValue(strfid, obs);
+		IvEvent event = new ObservationAddedEvent(ssid, strid, strfid, obs);
 		notifyEvent(event);
 	}
 	

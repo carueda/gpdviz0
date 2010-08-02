@@ -18,7 +18,7 @@ import java.util.Map;
 public class BaseNode implements Serializable, Comparable<BaseNode> {
 	private static final long serialVersionUID = 1L;
 
-	protected Map<String,String> attrs = new HashMap<String,String>();
+	private Map<String,String> attrs = new HashMap<String,String>();
 
 	// no-arg ctr.
 	BaseNode() {
@@ -55,8 +55,14 @@ public class BaseNode implements Serializable, Comparable<BaseNode> {
         return (String) attrs.get(attrName);
     }
     
-     
+    
+    /**
+     * @throw IllegalArgumentException if attrValue is null
+     */
     public final void setStringAttribute(String attrName, String attrValue) {
+    	if ( attrValue == null ) {
+    		throw new IllegalArgumentException("attrValue cannot be null");
+    	}
         attrs.put(attrName, attrValue);
     }
 

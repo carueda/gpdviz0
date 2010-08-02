@@ -1,5 +1,7 @@
 package org.gpdviz.mock;
 
+import java.io.PrintWriter;
+
 import org.gpdviz.client.GpdvizClient;
 
 
@@ -41,6 +43,7 @@ public class MockProvider  {
 			endPoint = args[0];
 		}
 		gpdvizClient = new GpdvizClient(endPoint);
+		gpdvizClient.setLogger(new PrintWriter(System.out, true), "%%%%% ");
 	}
 	
 }

@@ -2,9 +2,12 @@ package org.gpdviz.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.gpdviz.ss.Observation;
 import org.gpdviz.ss.Source;
 import org.gpdviz.ss.Stream;
 import org.gpdviz.ss.event.IvEvent;
@@ -12,7 +15,7 @@ import org.gpdviz.ss.event.IvEventDispatcher;
 import org.gpdviz.ss.event.IvEventListener;
 import org.gpdviz.ss.event.SourceAddedEvent;
 import org.gpdviz.ss.event.StreamAddedEvent;
-import org.gpdviz.ss.event.ValueAddedEvent;
+import org.gpdviz.ss.event.ObservationAddedEvent;
 import org.gpdviz.ss.event.SensorSystemRegisteredEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 import org.gpdviz.ss.event.SensorSystemUnregisteredEvent;
@@ -118,7 +121,7 @@ public class Generate extends MockProvider {
 			String longitude = event.getLon();
 			String description = latitude+ ", " +longitude;
 			
-			Status status = gpdvizClient.addNewSource(MOCK_SSID, srcid, description, latitude, longitude);
+			Status status = gpdvizClient.addSource(MOCK_SSID, srcid, description, latitude, longitude);
 			
 			String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
 			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcid+ ": " +status +error);
@@ -138,13 +141,29 @@ public class Generate extends MockProvider {
 			String srcid = src.getName();
 			String strid = str.getName();
 			
-			Status status = gpdvizClient.addNewStream(MOCK_SSID, srcid, strid);
+			Map<String,String> props = _setStreamProps(str);
+			
+			Status status = gpdvizClient.addStream(MOCK_SSID, srcid, strid, props);
 			
 			String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
 			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcid+ "/" +strid+ ": " +status +error);
 			
 		}
 		
+		/** Sets some props for the stream.
+		 *  Crude implementation but enough for the test.
+		 */
+		private Map<String, String> _setStreamProps(Stream str) {
+			Map<String,String> props = new HashMap<String,String>();
+			for ( String key : new String[] { "title", "legend", } ) {
+				String value = str.getStringAttribute(key);
+				if ( value != null ) {
+					props.put(key, value);
+				}
+			}
+			return props;
+		}
+
 		public void dispatchStreamRemovedEvent(StreamRemovedEvent event) {
 			
 			String srcfid = event.getSrcfid();
@@ -156,15 +175,16 @@ public class Generate extends MockProvider {
 			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ "/" +srcfid+ "/" +strid+ ": " +status +error);
 		}
 		
-		public void dispatchValueAddedEvent(ValueAddedEvent event) {
+		public void dispatchObservationAddedEvent(ObservationAddedEvent event) {
 			String strid = event.getStrid();
 			String strfid = event.getStrfid();
-			String value = event.getValue();
+			
+			Observation obs = event.getObservation();
 
-			Status status = gpdvizClient.addNewValue(MOCK_SSID, strid, strfid, value);
+			Status status = gpdvizClient.addObservation(MOCK_SSID, strid, strfid, obs);
 			
 			String error = status.equals(Status.SUCCESS_OK) ? "" : " ***ERROR***";
-			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ ": " +strfid+ ": " +value+ " : " +status +error);
+			_log(event.getClass().getSimpleName()+ ": " +MOCK_SSID+ ": " +strfid+ ": " +obs.getValue()+ " : " +status +error);
 		}
 		
 		public void dispatchSensorSystemResetEvent(SensorSystemResetEvent event) {

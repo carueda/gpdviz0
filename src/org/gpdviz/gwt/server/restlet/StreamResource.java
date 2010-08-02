@@ -2,6 +2,7 @@ package org.gpdviz.gwt.server.restlet;
 
 import java.io.IOException;
 
+import org.gpdviz.ss.Observation;
 import org.gpdviz.ss.SensorSystem;
 import org.gpdviz.ss.Source;
 import org.gpdviz.ss.Stream;
@@ -82,18 +83,27 @@ public class StreamResource extends BaseResource {
 		Form form = new Form(entity);
 		
 		String value = form.getFirstValue("value");
+		String timestamp = form.getFirstValue("timestamp");
 		
 		
 		// The PUT request updates or creates the resource.
 		// TODO synchronize to prevent concurrent update
 		if (str == null) {
 			// TODO other attributes for stream
-			Stream str = new Stream(strid, strfid, 1000, "UNITS");
+			Stream str = new Stream(strid, strfid, "1000", "UNITS");
 
 			ss.addStream(src, str);
 			
 			if ( value != null ) {
-				ss.addValue(src, str, value);
+				Observation obs = _createObservation(timestamp, value);
+				if ( obs == null ) {
+					// timestamp not given or malformed:
+					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+					return;
+				}
+				else {
+					ss.addObservation(src, str, obs);
+				}
 			}
 			
 			setStatus(Status.SUCCESS_CREATED);
@@ -104,7 +114,15 @@ public class StreamResource extends BaseResource {
 			str.setStringAttribute("units", "UNITS");
 
 			if ( value != null ) {
-				ss.addValue(src, str, value);
+				Observation obs = _createObservation(timestamp, value);
+				if ( obs == null ) {
+					// timestamp not given or malformed:
+					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+					return;
+				}
+				else {
+					ss.addObservation(src, str, obs);
+				}
 			}
 
 			setStatus(Status.SUCCESS_OK);
@@ -131,4 +149,27 @@ public class StreamResource extends BaseResource {
 		return null;
 	}
 
+	/**
+	 * Returns null on any error.
+	 * @param timestamp
+	 * @param value
+	 * @return
+	 */
+	private Observation _createObservation(String timestamp, String value) {
+		Long ts = null;
+		
+		if ( timestamp != null && value != null ) {
+			try {
+				ts = Long.parseLong(timestamp);
+				Observation obs = new Observation(ts, value);
+				return obs;
+			}
+			catch(NumberFormatException e) {
+				// error handled by returning null below.
+			}
+		}
+
+		return null;
+	}
+	
 }

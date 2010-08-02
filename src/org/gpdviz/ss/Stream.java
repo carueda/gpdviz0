@@ -28,10 +28,14 @@ public class Stream extends BaseNode implements Serializable {
     Stream() {
     }
     
-    public Stream(String name, String fullname, long period, String units) {
+    public Stream(String name, String fullname, String period, String units) {
         super(name, fullname);
-        setStringAttribute("period", String.valueOf(period));
-        setStringAttribute("units", units);
+        if ( period != null ) {
+        	setStringAttribute("period", period);
+        }
+        if ( units != null ) {
+        	setStringAttribute("units", units);
+        }
     }
 
     public long getPeriod() {

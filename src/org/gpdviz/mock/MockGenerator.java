@@ -1,11 +1,13 @@
 package org.gpdviz.mock;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.gpdviz.ss.Observation;
 import org.gpdviz.ss.SensorSystem;
 import org.gpdviz.ss.Source;
 import org.gpdviz.ss.Stream;
@@ -18,7 +20,7 @@ import org.gpdviz.ss.Stream;
 class MockGenerator {
 	
 	// probability to do removals
-	private static final double PROB_REMOVALS = 0.2;
+	private static final double PROB_REMOVALS = 0.05;
 
 	// timer attributes:
 	private static final long DELAY = 2000;
@@ -239,7 +241,8 @@ class MockGenerator {
 		
 		String strid = _getNextStreamId();
 		String strfid = srcfid+ "/" +strid;
-		Stream str = new Stream(strid, strfid, 1000, "UNITS");
+		Stream str = new Stream(strid, strfid, "1000", "UNITS");
+		str.setStringAttribute("title", "title for stream " +strfid);
 		ss.addStream(src, str);
 	}
 	
@@ -266,6 +269,7 @@ class MockGenerator {
 	 */
 	private void _addValue(Source src, Stream str) {
 		String value = String.valueOf(random.nextInt(1000));
-		ss.addValue(src, str, value);
+		Observation obs = new Observation(new Date().getTime(), value);
+		ss.addObservation(src, str, obs);
 	}
 }

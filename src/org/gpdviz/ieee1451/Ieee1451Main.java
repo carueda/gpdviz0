@@ -2,19 +2,26 @@ package org.gpdviz.ieee1451;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.gpdviz.client.GpdvizClient;
 import org.gpdviz.ieee1451.client.Ieee1451Client;
-import org.gpdviz.ieee1451.client.Ieee1451Client.DataPoint;
 import org.gpdviz.ieee1451.client.Ieee1451Client.TransducerInfo;
+import org.gpdviz.ss.Observation;
 import org.restlet.data.Status;
 
 
 /** 
- * A test client that "pulls" data from an IEEE1451 server and pushes is to
+ * A test client that "pulls" data from an IEEE1451 server and pushes it to
  * a Gpdviz endpoint.
+ * 
+ * <p>
+ * Note: Only for demonstration purposes.
+ * 
+ * <p>
  * 
  * @author Carlos Rueda
  */
@@ -22,48 +29,36 @@ public class Ieee1451Main {
 
 	private static final long PROGRAM_DURATION_MINS = 2;
 	
-
-// From the old code in sosplot:
-//	private static Oidemo1451ContentProvider[] ncaps = {
-//		new Oidemo1451ContentProvider("1", "http://oidemo.mbari.org:1451/1451"),
-//		//new Oidemo1451ContentProvider("2", "http://www.comsys.informatik.uni-kiel.de:1451/1451"),
-//		//new Oidemo1451ContentProvider("3", "http://esonet.bremen.wdc-mare.org:1451/1451"),
-//		new Oidemo1451ContentProvider("4", "http://134.89.13.150:1451/1451")		//new Oidemo1451ContentProvider("5", "http://147.83.140.20:1451/1451"),
-//		//new Oidemo1451ContentProvider("4", "http://147.83.140.20:1451/1451"),
-//		//new Oidemo1451ContentProvider("5", "http://147.83.140.10:1451/1451"),
-//	};
+	private final String USAGE = 					
+		"USAGE: " +getClass().getName()+ " params\n" +
+		"  params:\n" +
+		"    --endpoint <url>    The Gpdviz REST endpoint.\n" +
+		"    --server <url>      IEEE1451 server.\n" +
+		"    --ncap <num>        IEEE1451 NCAP ID.\n" +
+		"    --unregister        Unregister sensor system and exit\n";
 	
+
 	public static void main(String[] args) throws Exception {
 		new Ieee1451Main(args);
 	}
 
 
-	private GpdvizClient gpdvizClient;
 	private Ieee1451Client ieee1451Client;
+	private GpdvizClient gpdvizClient;
 	
-	private volatile boolean ncontinueRunning = true;
+	private volatile boolean continueRunning = true;
 	
 	private void _usage(String msg) {
 		if ( msg != null ) {
-			System.err.println(
-					getClass().getName()+ ": " +msg+ "\n" +
+			System.err.println(getClass().getName()+ ": " +msg+ "\n" +
 					"  Try --help\n"
 			);
 			System.exit(1);
 		}
 		else {
-			System.out.println(
-					"USAGE: " +getClass().getName()+ " params\n" +
-					"  params:\n" +
-					"    --endpoint <url>    The Gpdviz REST endpoint.\n" +
-					"    --server <url>    IEEE1451 server.\n" +
-					"    --ncap <num>      IEEE1451 NCAP ID.\n" +
-					"    --unregister      Unregister sensor system and exit\n" +
-					""
-			);
+			System.out.println(USAGE);
 			System.exit(0);
 		}
-
 	}
 
 	Ieee1451Main(String[] args) throws Exception {
@@ -105,8 +100,8 @@ public class Ieee1451Main {
 			_usage("missing ieee1451 ncap");
 		}
 
-		final String ssid = "ieee1451." +ieee1451ncap;
-		String ssDescription = "some description";
+		final String ssid = "ieee1451";
+		final String ssDescription = "some description of sensor system " +ssid;
 		
 		gpdvizClient = new GpdvizClient(endPoint);
 		gpdvizClient.setLogger(new PrintWriter(System.out, true), "%%%%% ");
@@ -118,6 +113,13 @@ public class Ieee1451Main {
 		}
 		
 		ieee1451Client = new Ieee1451Client(ieee1451ncap, ieee1451server);
+		
+		_dispatch(assumeRegistered, ssid, ssDescription);
+	}
+	
+	private void _dispatch(boolean assumeRegistered, final String ssid,
+			String ssDescription
+	) throws Exception {
 		
 		String[] tims = ieee1451Client.getTims();
 		if ( tims.length == 0 ) {
@@ -137,17 +139,20 @@ public class Ieee1451Main {
 			
 			_pause();
 			final String srcid = "tim_" +timId;
-			gpdvizClient.addNewSource(ssid, srcid, timDescription, latlon[0], latlon[1]);
+			gpdvizClient.addSource(ssid, srcid, timDescription, latlon[0], latlon[1]);
 			
 
 			TransducerInfo[] transducerInfos = ieee1451Client.getTransducerInfos(timId);
 			for (final TransducerInfo ti : transducerInfos) {
 				
-				// not used yet
-//				String chDescription = ieee1451Client.getChannelDescription(timId, ti.channelId);
+				
+				Map<String,String> props = new HashMap<String,String>();
+				
+				String chDescription = ieee1451Client.getChannelDescription(timId, ti.getChannelId());
+				props.put("title", chDescription);
 				
 				final String strid = "ch_" +ti.getChannelId();
-				gpdvizClient.addNewStream(ssid, srcid, strid);
+				gpdvizClient.addStream(ssid, srcid, strid, props);
 				_pause();
 				
 				final Timer timer = new Timer();
@@ -155,16 +160,14 @@ public class Ieee1451Main {
 
 					@Override
 					public void run() {
-						if ( ! ncontinueRunning ) {
+						if ( ! continueRunning ) {
 							timer.cancel();
 							return;
 						}
 						
 						try {
-							DataPoint dp = ieee1451Client.getDataPoint(timId, ti.getChannelId());
-							// millis not used yet
-//							long millis = dp.getMillis();
-							gpdvizClient.addNewValue(ssid, strid, srcid+ "/" +strid, dp.getValue());
+							Observation obs = ieee1451Client.getObservation(timId, ti.getChannelId());
+							gpdvizClient.addObservation(ssid, strid, srcid+ "/" +strid, obs);
 						}
 						catch (Exception e) {
 							e.printStackTrace();
@@ -173,18 +176,14 @@ public class Ieee1451Main {
 					}
 					
 				}, 1000, 10000);
-				
 			}
-			
 		}
 			
 		// timer to terminate this demo
 		new Timer().schedule(new TimerTask() {
-
 			@Override
 			public void run() {
-				ncontinueRunning = false;
-
+				continueRunning = false;
 				_log("Time to terminate this demo.");
 				try {
 					gpdvizClient.unregisterSensorSystem(ssid);
@@ -192,10 +191,8 @@ public class Ieee1451Main {
 				catch (Exception e) {
 					e.printStackTrace();
 				}
-				
 				System.exit(0);
 			}
-			
 		}, PROGRAM_DURATION_MINS * 60 * 1000);
 		
 		_log("This demo will exit in " +PROGRAM_DURATION_MINS+ " minutes.");
@@ -213,7 +210,6 @@ public class Ieee1451Main {
 
 		if ( status.equals(Status.SUCCESS_OK) ) {
 			_log(writer.toString());
-
 			_log("ALREADY registered.  Resetting...");
 
 			status = gpdvizClient.resetSensorSystem(ssid, description);
@@ -225,15 +221,12 @@ public class Ieee1451Main {
 		}
 	}
 
-
-	void _log(String msg) {
+	private void _log(String msg) {
 		System.out.println("=== " +msg);
 	}
 
-	void _pause() throws Exception {
-//		_log("Press Enter to continue");
-//		System.in.read();
+	private void _pause() throws Exception {
 		Thread.sleep(1000);
 	}
-	
+
 }

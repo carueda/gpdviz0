@@ -17,6 +17,6 @@ public interface IvEventDispatcher {
 	void dispatchStreamAddedEvent(StreamAddedEvent event);
 	void dispatchStreamRemovedEvent(StreamRemovedEvent event);
 	
-	void dispatchValueAddedEvent(ValueAddedEvent event);
+	void dispatchObservationAddedEvent(ObservationAddedEvent event);
 	
 }

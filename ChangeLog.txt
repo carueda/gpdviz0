@@ -3,6 +3,19 @@ Carlos Rueda - MBARI
 
 ChangeLog
 
+2010-08-01
+	- Added Observation class for the various operations involving stream values and
+	  did associated method renamings.
+	  
+	- TODO: VizPanel: handle the timestamp
+	- TODO: accept/handle a list of observations
+	
+	Note: I forgot to add the required no-arg constructor to Observation; however, the 
+	development mode launched from within eclipse didn't generate any error or warning in
+	any of the lof windows! The application ran but failed upon generation of observation
+	with just an error related with the icePush library, but no more.
+	
+	
 2010-07-31
 	- Bug below fixed:
 	  - LocationsPanel.clear() was not clearing _elements map.

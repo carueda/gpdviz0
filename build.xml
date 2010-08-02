@@ -2,6 +2,8 @@
 <project name="gpdviz" default="war" basedir=".">
 
 	<property file="build.properties" />
+	
+	<fail unless="gwt.sdk" message="Please set the gwt.sdk (path to your GWT SDK)"/>
 
 	<!-- Gpdviz endpoint for test programs -->
 	<property name="endpoint" value="http://localhost:8080/gpdviz/rest" />

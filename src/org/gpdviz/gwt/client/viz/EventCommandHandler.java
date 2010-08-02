@@ -2,19 +2,20 @@ package org.gpdviz.gwt.client.viz;
 
 import org.gpdviz.gwt.client.Gpdviz;
 import org.gpdviz.gwt.client.util.MessagesPopup;
+import org.gpdviz.ss.Observation;
 import org.gpdviz.ss.Source;
 import org.gpdviz.ss.Stream;
 import org.gpdviz.ss.event.IvCommand;
 import org.gpdviz.ss.event.IvEvent;
 import org.gpdviz.ss.event.IvEventDispatcher;
-import org.gpdviz.ss.event.SourceAddedEvent;
-import org.gpdviz.ss.event.StreamAddedEvent;
-import org.gpdviz.ss.event.ValueAddedEvent;
 import org.gpdviz.ss.event.SensorSystemRegisteredEvent;
 import org.gpdviz.ss.event.SensorSystemResetEvent;
 import org.gpdviz.ss.event.SensorSystemUnregisteredEvent;
+import org.gpdviz.ss.event.SourceAddedEvent;
 import org.gpdviz.ss.event.SourceRemovedEvent;
+import org.gpdviz.ss.event.StreamAddedEvent;
 import org.gpdviz.ss.event.StreamRemovedEvent;
+import org.gpdviz.ss.event.ObservationAddedEvent;
 import org.icepush.gwt.client.command.ICommand;
 import org.icepush.gwt.client.command.ICommandExecuter;
 
@@ -104,14 +105,16 @@ class EventCommandHandler implements ICommandExecuter, IvEventDispatcher {
 	}
 		
 
-	public void dispatchValueAddedEvent(final ValueAddedEvent event) {
+	public void dispatchObservationAddedEvent(final ObservationAddedEvent event) {
 		_debugEvent(event);
 		
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
 				String strfid = event.getStrfid();
-				String value = event.getValue();
-				vizPanel.addNewValue(strfid, value);
+				Observation obs = event.getObservation();
+				long timestamp = obs.getTimestamp();
+				String value = obs.getValue();
+				vizPanel.addNewValue(strfid, timestamp, value);
 			}
 		});
 	}

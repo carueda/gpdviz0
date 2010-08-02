@@ -3,7 +3,10 @@ package org.gpdviz.client;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.gpdviz.ss.Observation;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -12,6 +15,9 @@ import org.restlet.resource.ResourceException;
 
 /**
  * Client connection to a Gpdviz endpoint.
+ * 
+ * <p>
+ * Note: preliminary.  API subject to change.
  * 
  * @author Carlos Rueda
  */
@@ -146,7 +152,7 @@ public class GpdvizClient {
 	 * @param longitude
 	 * @return
 	 */
-	public Status addNewSource(String ssid, String srcid, String description, String latitude, String longitude) {
+	public Status addSource(String ssid, String srcid, String description, String latitude, String longitude) {
 		
 		ClientResource ssResource = new ClientResource(endpoint + "/" +ssid+ "/");
 		
@@ -171,13 +177,14 @@ public class GpdvizClient {
 	 * @param ssid
 	 * @param srcid
 	 * @param strid
+	 * @param props
 	 * @return
 	 */
-	public Status addNewStream(String ssid, String srcid, String strid) {
+	public Status addStream(String ssid, String srcid, String strid, Map<String,String> props) {
 		
 		ClientResource ssResource = new ClientResource(endpoint + "/" +ssid+ "/" +srcid+ "/");
 		
-		Representation rep = _getStreamRepresentation(strid, null);
+		Representation rep = _getStreamRepresentation(strid, null, props);
 		return _post(ssResource, rep);
 		
 	}
@@ -195,17 +202,17 @@ public class GpdvizClient {
 	}
 	
 	/**
-	 * Adds a value to a stream.
+	 * Adds an observation to a stream.
 	 * @param ssid    Sensor system ID
 	 * @param strid   Stream ID
 	 * @param strfid  Full stream ID
-	 * @param value   the value
+	 * @param obs      the observation
 	 * @return
 	 */
-	public Status addNewValue(String ssid, String strid, String strfid, String value) {
+	public Status addObservation(String ssid, String strid, String strfid, Observation obs) {
 		ClientResource ssResource = new ClientResource(endpoint + "/" +ssid+ "/" +strfid);
 		
-		Representation rep = _getStreamRepresentation(strid, value);
+		Representation rep = _getStreamRepresentation(strid, obs, null);
 		return _put(ssResource, rep);
 	}
 
@@ -235,12 +242,26 @@ public class GpdvizClient {
 		return form.getWebRepresentation();
 	}
 	
-	private Representation _getStreamRepresentation(String strid, String value) {
+	private Representation _getStreamRepresentation(String strid, Observation obs, Map<String,String> props) {
 		Form form = new Form();
 		form.add("strid", strid);
-		if ( value != null ) {
-			form.add("value", value);
+		
+		if ( obs != null ) {
+			form.add("timestamp", String.valueOf(obs.getTimestamp()));
+			form.add("value", obs.getValue());
 		}
+		
+		if ( props != null ) {
+			for ( Entry<String, String> entry : props.entrySet() ) {
+				form.add(entry.getKey(), entry.getValue());	
+			}
+		}
+		
+		// default values  TODO handle this in a better way
+		if ( form.getFirst("period") == null ) {
+			form.add("period", "3000");
+		}
+		
 		return form.getWebRepresentation();
 	}
 	

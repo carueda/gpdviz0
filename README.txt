@@ -66,6 +66,16 @@ To indicate a different endpoint, use ``ant -Dendpoint=someURL ...''
 	$ ant mock-unregister
 # Unregisters the mock sensor system.
 
+	$ ant ieee1451
+# runs a IEEE 1451-based sensor system with ID "ieee1451".
+# Open http://localhost:8080/gpdviz?ssid=ieee1451 in your browser.
+# This sensor system "pulls" data from an IEEE1451 server and pushes it to the  Gpdviz endpoint.
+# If you kill the program before it finishes, call ``ant ieee1451-unregister'' to unregister this 
+# sensor system.
+
+	$ ant ieee1451-unregister
+# Unregisters the "ieee1451" sensor system.
+
 Open http://localhost:8080/gpdviz/rest/ to see the current registered sensor systems.
 
 == Visualization parameters ==

@@ -62,11 +62,10 @@ public class StreamPanel {
 	
 	private IChart _createChart() {
 		
-		// TODO capture all these attrs appropriately
-        String title = "myTitle";
-        String legend = null;
-        String xLabel = null; 
-        String yLabel = "myUnits"; //stream.getStringAttribute("units");
+        String title = str.getStringAttribute("title");
+        String legend = str.getStringAttribute("legend");
+        String xLabel = str.getStringAttribute("xlabel"); 
+        String yLabel = str.getStringAttribute("units");
         
         IChart chart = ChartCreator.createChartStyle1(title, legend, xLabel, yLabel); 
 
