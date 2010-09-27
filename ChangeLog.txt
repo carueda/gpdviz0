@@ -3,6 +3,9 @@ Carlos Rueda - MBARI
 
 ChangeLog
 
+2010-09-27
+	- just tested it ok with GWT 2.0.4
+	
 2010-08-01
 	- Added Observation class for the various operations involving stream values and
 	  did associated method renamings.
