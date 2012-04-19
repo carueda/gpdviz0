@@ -52,6 +52,8 @@
 			<classpath>
 				<pathelement location="src" />
 				<path refid="project.class.path" />
+				<pathelement path="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar"/>
+				<pathelement path="${gwt.sdk}/validation-api-1.0.0.GA.jar"/>
 			</classpath>
 			<!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
 			<jvmarg value="-Xmx256M" />
