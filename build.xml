@@ -38,7 +38,8 @@
 
 	<target name="javac" depends="libs" description="Compile java source">
 		<mkdir dir="war/WEB-INF/classes" />
-		<javac srcdir="src" includes="**" encoding="utf-8" destdir="war/WEB-INF/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+		<javac srcdir="src" includes="**" encoding="utf-8" destdir="war/WEB-INF/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source"
+			includeantruntime="false">
 			<classpath refid="project.class.path" />
 		</javac>
 		<copy todir="war/WEB-INF/classes">
@@ -65,6 +66,8 @@
 			<classpath>
 				<pathelement location="src" />
 				<path refid="project.class.path" />
+				<pathelement path="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar"/>
+				<pathelement path="${gwt.sdk}/validation-api-1.0.0.GA.jar"/>
 			</classpath>
 			<jvmarg value="-Xmx256M" />
 			<arg value="-startupUrl" />
@@ -157,7 +160,8 @@ Test targets suppressed because -junit argument was not specified when running w
 
 	<target name="client-compile" depends="libs" description="Compile java source for client library">
 		<mkdir dir="_generated/client/classes" />
-		<javac srcdir="src" encoding="utf-8" destdir="_generated/client/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+		<javac srcdir="src" encoding="utf-8" destdir="_generated/client/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source"
+			includeantruntime="false">
 			<classpath refid="project.class.path" />
 			<include name="org/gpdviz/client/**" />
 			<include name="org/gpdviz/ss/**" />
@@ -176,7 +180,8 @@ Test targets suppressed because -junit argument was not specified when running w
 	<!-- simple client test -->
 	<target name="simple-client-compile" depends="client-jar" description="Compile java source for simple client demo">
 		<mkdir dir="_generated/simple-client/classes" />
-		<javac srcdir="src" encoding="utf-8" destdir="_generated/simple-client/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+		<javac srcdir="src" encoding="utf-8" destdir="_generated/simple-client/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source"
+			includeantruntime="false">
 			<classpath refid="project.class.path" />
 			<classpath location="_generated/gpdviz-client.jar" />
 			<include name="org/gpdviz/simpleclient/**" />
@@ -198,7 +203,8 @@ Test targets suppressed because -junit argument was not specified when running w
 
 	<target name="mock-compile" depends="client-jar" description="Compile java source for mock demo jar">
 		<mkdir dir="_generated/mock/classes" />
-		<javac srcdir="src" encoding="utf-8" destdir="_generated/mock/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+		<javac srcdir="src" encoding="utf-8" destdir="_generated/mock/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source"
+			includeantruntime="false">
 			<classpath refid="project.class.path" />
 			<classpath location="_generated/gpdviz-client.jar" />
 			<include name="org/gpdviz/mock/**" />
@@ -241,7 +247,8 @@ Test targets suppressed because -junit argument was not specified when running w
 	<!-- IEEE1451 test -->
 	<target name="ieee1451-compile" depends="client-jar" description="Compile java source for IEEE1451 demo jar">
 		<mkdir dir="_generated/ieee1451/classes" />
-		<javac srcdir="src" encoding="utf-8" destdir="_generated/ieee1451/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+		<javac srcdir="src" encoding="utf-8" destdir="_generated/ieee1451/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source"
+			includeantruntime="false">
 			<classpath refid="project.class.path" />
 			<classpath location="_generated/gpdviz-client.jar" />
 			<include name="org/gpdviz/ieee1451/**" />
